@@ -1,0 +1,40 @@
+<div ng-controller='dash-cont' wait-for-data='$parent.user,topicObjs,activeLessons'>
+    <!-- REMOVED: postrender-action="getAll()" -->
+    <div class="message">
+        <div class="message-header"> TINY Characters </div>
+        <div class="message-body blocky is-fullwidth">
+            <table class="table is-fullwidth is-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            &nbsp;
+                        </th>
+                        <th>
+                            Name:
+                        </th>
+                        <th>
+                            Profession
+                        </th>
+                        <th>Race</th>
+                        <th>
+                            Level
+                        </th>
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat='chr in user.chars'>
+                        <td><img src="{{chr.icon}}" alt=""></td>
+                        <td>{{chr.name}}</td>
+                        <td>{{chr.subProf||chr.prof}}</td>
+                        <td><span ng-if='chr.race!="Asura"' title="This character is not an asura! Please check with your fellow [TINY]s if it's still okay to use this character (up to the group)!"><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.race}}</td>
+                        <td><span ng-if='chr.level!=80' title="This character is not max level! Most fractal groups will not accept sub-max-level characters."><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.level}}</td>
+                        <td><button class="button is-info">hi</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

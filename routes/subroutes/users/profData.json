@@ -1,0 +1,105 @@
+{
+    "regular":{
+        "Guardian": "https://render.guildwars2.com/file/28D46E95F70834CE45640375FCDB0DEAF198325B/716635.png",
+        "Warrior": "https://render.guildwars2.com/file/09903302A30373E52F49CBA948D4A268D30A5E39/716647.png",
+        "Revenant": "https://render.guildwars2.com/file/FF240FFCF7D86A0436450FB610AB21716D5B6AA7/965716.png",
+        "Necromancer": "https://render.guildwars2.com/file/08BD360F557115260FA4D71E6F76ACCCF59FF70F/716639.png",
+        "Mesmer": "https://render.guildwars2.com/file/B2D21D2FFDB5C95CDC72B91BB02F60080F0F463D/716638.png",
+        "Elementalist": "https://render.guildwars2.com/file/0303027C1F73E97F5F011ECFCE9C9A40767BB747/716633.png",
+        "Thief": "https://render.guildwars2.com/file/5C092FE9351A2DF820B1B5719B5F5097D20633EE/716644.png",
+        "Ranger": "https://render.guildwars2.com/file/9BFA11F4D5114FBF11AFBEF00F249C3934AD62AD/716643.png",
+        "Engineer": "https://render.guildwars2.com/file/1E90D49793D5BAFDE2DFDC95089FDF9A997401F1/716634.png"
+    },
+    "elites": [
+        {
+            "name": "Druid",
+            "id": 5,
+            "icon": "https://render.guildwars2.com/file/F910F8BBCAF80355FFDB264160C899594300D7B2/1128574.png"
+        },
+        {
+            "name": "Daredevil",
+            "id": 7,
+            "icon": "https://render.guildwars2.com/file/232D31C9A3076F6A6B41167FBDA7D50F70C82260/1128570.png"
+        },
+        {
+            "name": "Berserker",
+            "id": 18,
+            "icon": "https://render.guildwars2.com/file/E39819140FF49CB5C800B064E17EA221C909DFD5/1128566.png"
+        },
+        {
+            "name": "Dragonhunter",
+            "id": 27,
+            "icon": "https://render.guildwars2.com/file/1B3B15431B002C09BDABEB7C0E28FCF764FDDB23/1128572.png"
+        },
+        {
+            "name": "Reaper",
+            "id": 34,
+            "icon": "https://render.guildwars2.com/file/C9A2C304CFBFA3CBBF41DA0EE756C519F5050D5F/1128578.png"
+        },
+        {
+            "name": "Chronomancer",
+            "id": 40,
+            "icon": "https://render.guildwars2.com/file/4C919A74282939EC004333292A93A4073CCDFFFD/1128568.png"
+        },
+        {
+            "name": "Scrapper",
+            "id": 43,
+            "icon": "https://render.guildwars2.com/file/21C007BE69070E099BF05B4ED04A2D2B90B8FB1F/1128580.png"
+        },
+        {
+            "name": "Tempest",
+            "id": 48,
+            "icon": "https://render.guildwars2.com/file/CDE1093102F02010B30FB210F2AC77A5F00C2535/1128582.png"
+        },
+        {
+            "name": "Herald",
+            "id": 52,
+            "icon": "https://render.guildwars2.com/file/513E3D33671326D32ABD070575017451AA229A08/1128576.png"
+        },
+        {
+            "name": "Soulbeast",
+            "id": 55,
+            "icon": "https://render.guildwars2.com/file/7257FBD9A35002DC5155062773D305353AF45E2F/1770214.png"
+        },
+        {
+            "name": "Weaver",
+            "id": 56,
+            "icon": "https://render.guildwars2.com/file/06F17108155842F0C37F3E7EF901ABB17D0C9232/1670505.png"
+        },
+        {
+            "name": "Holosmith",
+            "id": 57,
+            "icon": "https://render.guildwars2.com/file/A84BD2D74D3239451E3FF4EFC0F6A146F3F6653E/1770224.png"
+        },
+        {
+            "name": "Deadeye",
+            "id": 58,
+            "icon": "https://render.guildwars2.com/file/2BE4F4AB7F69206BBDABB20CACB1DC7911B33F4E/1770212.png"
+        },
+        {
+            "name": "Mirage",
+            "id": 59,
+            "icon": "https://render.guildwars2.com/file/A879752D07B7E8A154A952AC99D01EDC9FBC60A9/1770216.png"
+        },
+        {
+            "name": "Scourge",
+            "id": 60,
+            "icon": "https://render.guildwars2.com/file/1556059855E5624F269B049F3D08B7B122B43906/1770220.png"
+        },
+        {
+            "name": "Spellbreaker",
+            "id": 61,
+            "icon": "https://render.guildwars2.com/file/342C1C032B5513EF1CC5082592A8D8A6EEC33197/1770222.png"
+        },
+        {
+            "name": "Firebrand",
+            "id": 62,
+            "icon": "https://render.guildwars2.com/file/AA12C93CBF5D25E40409060D5CD69E27F72B0892/1770210.png"
+        },
+        {
+            "name": "Renegade",
+            "id": 63,
+            "icon": "https://render.guildwars2.com/file/132E53C7D89FB623402FE3A808EBF62B5C0A016F/1770218.png"
+        }
+    ]
+}
