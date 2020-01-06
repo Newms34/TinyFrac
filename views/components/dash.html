@@ -1,10 +1,10 @@
 <div ng-controller='dash-cont' wait-for-data='$parent.user,topicObjs,activeLessons'>
     <!-- REMOVED: postrender-action="getAll()" -->
-    <div class="message">
+    <div class="message has-background-tiny-light">
         <div class="message-header"> TINY Characters </div>
         <div class="message-body blocky is-fullwidth">
-            <table class="table is-fullwidth is-striped">
-                <thead>
+            <table class="table is-fullwidth has-text-white has-background-tiny-army">
+                <thead class='has-text-white'>
                     <tr>
                         <th>
                             &nbsp;
@@ -15,7 +15,6 @@
                         <th>
                             Profession
                         </th>
-                        <th>Race</th>
                         <th>
                             Level
                         </th>
@@ -26,12 +25,15 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat='chr in user.chars'>
-                        <td><img src="{{chr.icon}}" alt=""></td>
+                        <td>
+                            <img src="{{chr.icon}}" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">
+                            <img src="./img/races/{{chr.race.toLowerCase()}}.png" alt="{{chr.race}}" title="{{chr.race}}">
+                        </td>
                         <td>{{chr.name}}</td>
                         <td>{{chr.subProf||chr.prof}}</td>
-                        <td><span ng-if='chr.race!="Asura"' title="This character is not an asura! Please check with your fellow [TINY]s if it's still okay to use this character (up to the group)!"><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.race}}</td>
+                        <!-- <td><span ng-if='chr.race!="Asura"' title="This character is not an asura! Please check with your fellow [TINY]s if it's still okay to use this character (up to the group)!"><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.race}}</td> -->
                         <td><span ng-if='chr.level!=80' title="This character is not max level! Most fractal groups will not accept sub-max-level characters."><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.level}}</td>
-                        <td><button class="button is-info">hi</button></td>
+                        <td><input type="checkbox" ng-model='chr.forFracs' id='{{$index}}-chr-chk'>&nbsp;<label for="{{$index}}-chr-chk">Available for fractals</label></td>
                     </tr>
                 </tbody>
             </table>

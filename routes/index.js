@@ -7,6 +7,7 @@ mongoose.Promise = Promise;
 
 module.exports = function(io) {
     router.use('/user', require('./subroutes/users')(io,mongoose));
+    router.use('/groups', require('./subroutes/groups')(io,mongoose));
     router.get('/reset', function(req, res, next) {
         // console.log('trying to get main page!')
         res.sendFile('reset.html', { root: './views' });

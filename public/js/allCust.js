@@ -67,9 +67,9 @@ app
                 url: '/', //default route, if not 404
                 templateUrl: 'components/dash.html'
             })
-            .state('app.sched', {
-                url: '/mentor',
-                templateUrl: 'components/schedule.html'
+            .state('app.group', {
+                url: '/group',
+                templateUrl: 'components/group.html'
             })
             //SIMPLE (unauth'd: login, register, forgot, 404, 500,reset)
             .state('appSimp', {
@@ -109,8 +109,6 @@ app
                     return $q.reject(rejection);
                 },
 
-
-
                 // optional method
                 'response': function (response, $http) {
                     // do something on success
@@ -118,6 +116,9 @@ app
                     if (response && response.data && response.data == 'refresh') {
                         // console.log('need to refresh',socket,socket.to)
                         socket.emit('requestRefresh',{id:socket.id})
+                    }else if (response && response.data && response.data == 'refGrp') {
+                        // console.log('need to refresh',socket,socket.to)
+                        socket.emit('requestRefGrp',{id:socket.id})
                     }
                     return response;
                 },
@@ -270,6 +271,44 @@ const countDups = (arr, p) => {
     }
     return false;
 };
+app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
+    // $log.debug("Dashboard ctrl registered")
+    $scope.refUsr = $scope.$parent.refUsr;
+    $scope.refUsr();
+    $scope.refGrps = ()=>{
+        $http.get('/groups/group').then(r=>{
+            console.log(r.data)
+            $scope.groups = r.data;
+        })
+    }
+    $scope.newGrp = {};
+    socket.on('refreshGrpById',u=>{
+        $scope.refGrps();
+    });
+    $scope.submitNewGrp = ()=>{
+        if(!$scope.newGrp.times || !$scope.newGrp.levels ||!$scope.newGrp.char ){
+            return bulmabox.alert('Missing Info',`Hey! You need to at least tell us when your group's gonna meet and what levels you're gonna do.<br> In addition, you need to pick the character you wanna participate with.`);
+        }else{
+            $http.post('/groups/group',$scope.newGrp).then(r=>{
+                console.log(r);
+                $scope.makinGroup=false;
+                $scope.$digest();
+            })
+        }
+    }
+    $scope.toggleGrpMember = d =>{
+        const char  = $scope.isGrpMember[0];
+        $http.put('/groups/member',{grpId:d}).then(r=>{
+            console.log(r);
+        })
+    }
+    $scope.isGrpMember = (grp)=>{
+        const simpUserChars = $scope.user.chars.map(q=>q.name.toLowerCase());
+        return grp.members.map(q=>q.name.toLowerCase()).filter(a=>simpUserChars.includes(a)).length;
+    }
+    $scope.refGrps();
+});
+
 app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) {
     $scope.goReg = () => {
         $state.go('appSimp.register');
@@ -449,6 +488,12 @@ app.controller('main-cont', function ($scope, $http, $state, userFact, $log) {
             // $scope.$apply();
         }); 
     };
+    socket.on('refreshById',u=>{
+        userFact.getUser().then(r => {
+            $scope.user = r.data;            
+            $scope.$apply();
+        }); 
+    });
 }).filter('numToDate', function () {
     return function (num) {
         if (isNaN(num)) {
@@ -479,13 +524,11 @@ app.controller('nav-cont',function($scope,$http,$state, $log, userFact){
     $scope.navEls = [{
         st:'dash',
         icon:'user-circle',
-        protected:false,
         text:'Home'
     },{
-        st:'match',
+        st:'group',
         icon:'users',
-        protected:false,
-        text:'Match'
+        text:'Group'
     }];
     $scope.goState = s =>{
         $scope.currState = s;

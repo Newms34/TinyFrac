@@ -1,0 +1,124 @@
+<div ng-controller='group-cont'>
+    <div class="message has-background-tiny-light">
+        <div class="message-header"> Groups </div>
+        <div class="message-body blocky is-fullwidth">
+            <div class="columns is-multiline is-fullwidth">
+                <div class="column is-full">
+                    <div class="message is-info">
+                        <div class="message-header">
+                            Join A Group
+                        </div>
+                        <div class="message-body blocky">
+                            <table class="table is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Group ID
+                                        </th>
+                                        <th>
+                                            Creator
+                                        </th>
+                                        <th>
+                                            Levels/Restrictions
+                                        </th>
+                                        <th>
+                                            Times
+                                        </th>
+                                        <th>
+                                            TINYs
+                                        </th>
+                                        <th>
+                                            Notes
+                                        </th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat='g in groups'>
+                                        <td>{{g.grpId}}</td>
+                                        <td>{{g.creator.name}}</td>
+                                        <td>{{g.levels}}</td>
+                                        <td>{{g.times}}</td>
+                                        <td><ul>
+                                            <li ng-repeat='m in g.members'>
+                                                <img class='smol-img' src="./img/races/{{m.race}}.png" alt="">
+                                                {{m.name}}
+                                            </li>
+                                        </ul></td>
+                                        <td>{{g.notes}}</td>
+                                        <td>
+                                            <button class="button is-info" ng-show='!isGrpMember(g).length' ng-click='toggleGrpMember(grp.grpId);'>
+                                                <i class="fa fa-check"></i>&nbsp;Join
+                                            </button>
+                                            <button class="button is-danger" ng-show='!!isGrpMember(g).length' ng-click='toggleGrpMember(grp.grpId);'>
+                                                <i class="fa fa-times"></i>&nbsp;Leave
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if='!groups|| !groups.length'>
+                                        <td colspan="5" class='has-text-centered has-text-grey'>
+                                            No Fractal groups have been created yet! Go ahead and create one! <i class="fa fa-arrow-right"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-full">
+                    <div class="message is-link">
+                        <div class="message-header">
+                            Create A Group
+                        </div>
+                        <div class="message-body blocky">
+                            <div class="is-fullwidth has-text-centered" ng-show='!makinGroup'>
+                                <button class="button is-large is-info" ng-click='makinGroup=true'><i class="fa fa-plus"></i>&nbsp;Create a group</button>
+                            </div>
+                            <div class="is-fullwidth columns is-multiline" ng-show='makinGroup'>
+                                <div class="notification column is-one-fifth">
+                                    Your Character:
+                                </div>
+                                <div class="column is-four-fifths">
+                                    <p class="select">
+                                        <select ng-model='newGrp.char' ng-options='char as char.name for char in user.chars'>
+                                            <option selected disabled class='has-text-grey' value=''>Which character do you wanna use?</option>
+                                        </select>
+                                        <span ng-show='newGrp.char'>{{newGrp.char.race}} {{newGrp.char.subProf || newGrp.char.prof}}</span>
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="notification column is-one-fifth">
+                                    Levels:
+                                </div>
+                                <div class="column is-four-fifths">
+                                    <textarea ng-model='newGrp.levels' class="textarea" placeholder='What level fractals do you plan to do? Can be a range, tier, or anything!'></textarea>
+                                </div>
+                                <hr>
+                                <div class="notification column is-one-fifth">
+                                    Times:
+                                </div>
+                                <div class="column is-four-fifths">
+                                    <textarea ng-model='newGrp.times' class="textarea" placeholder='Describe when this will take place (e.g., Fridays at Noon EST)'></textarea>
+                                </div>
+                                <hr>
+                                <div class="notification column is-one-fifth">
+                                    Notes:
+                                </div>
+                                <div class="column is-four-fifths">
+                                    <textarea ng-model='newGrp.notes' class="textarea" placeholder='Any other info you wanna include?'></textarea>
+                                </div>
+                                <hr>
+
+                                <div class="is-fullwidth has-text-centered">
+                                    <button class="button is-large is-link" ng-click='submitNewGrp();'>
+                                        <i class="fa check"></i>&nbsp;Create Fractal Group
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

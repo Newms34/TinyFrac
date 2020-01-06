@@ -64,9 +64,9 @@ app
                 url: '/', //default route, if not 404
                 templateUrl: 'components/dash.html'
             })
-            .state('app.sched', {
-                url: '/mentor',
-                templateUrl: 'components/schedule.html'
+            .state('app.group', {
+                url: '/group',
+                templateUrl: 'components/group.html'
             })
             //SIMPLE (unauth'd: login, register, forgot, 404, 500,reset)
             .state('appSimp', {
@@ -106,8 +106,6 @@ app
                     return $q.reject(rejection);
                 },
 
-
-
                 // optional method
                 'response': function (response, $http) {
                     // do something on success
@@ -115,6 +113,9 @@ app
                     if (response && response.data && response.data == 'refresh') {
                         // console.log('need to refresh',socket,socket.to)
                         socket.emit('requestRefresh',{id:socket.id})
+                    }else if (response && response.data && response.data == 'refGrp') {
+                        // console.log('need to refresh',socket,socket.to)
+                        socket.emit('requestRefGrp',{id:socket.id})
                     }
                     return response;
                 },

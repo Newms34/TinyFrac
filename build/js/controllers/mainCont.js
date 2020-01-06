@@ -9,6 +9,12 @@ app.controller('main-cont', function ($scope, $http, $state, userFact, $log) {
             // $scope.$apply();
         }); 
     };
+    socket.on('refreshById',u=>{
+        userFact.getUser().then(r => {
+            $scope.user = r.data;            
+            $scope.$apply();
+        }); 
+    });
 }).filter('numToDate', function () {
     return function (num) {
         if (isNaN(num)) {

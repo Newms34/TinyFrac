@@ -60,6 +60,10 @@ io.on('connection', function (socket) {
         console.log('REQUESTED REFRESH',o,io.to)
         io.to(o.id).emit('refreshById')
     })
+    socket.on('requestRefGrp',function(o){
+        console.log('REQUESTED REFRESH',o,io.to)
+        io.to(o.id).emit('refreshGrpById')
+    })
 });
 server.listen(process.env.PORT || 8080,function(){
     console.log('Server is listening!')
