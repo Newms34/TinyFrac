@@ -47,10 +47,10 @@
                                         </ul></td>
                                         <td>{{g.notes}}</td>
                                         <td>
-                                            <button class="button is-info" ng-show='!isGrpMember(g).length' ng-click='toggleGrpMember(grp.grpId);'>
+                                            <button class="button is-info" ng-show='!isGrpMember(g).length' ng-click='addGrp(g.grpId);'>
                                                 <i class="fa fa-check"></i>&nbsp;Join
                                             </button>
-                                            <button class="button is-danger" ng-show='!!isGrpMember(g).length' ng-click='toggleGrpMember(grp.grpId);'>
+                                            <button class="button is-danger" ng-show='!!isGrpMember(g).length' ng-click='removeGrp(g);'>
                                                 <i class="fa fa-times"></i>&nbsp;Leave
                                             </button>
                                         </td>
@@ -111,7 +111,10 @@
 
                                 <div class="is-fullwidth has-text-centered">
                                     <button class="button is-large is-link" ng-click='submitNewGrp();'>
-                                        <i class="fa check"></i>&nbsp;Create Fractal Group
+                                        <i class="fa fa-check"></i>&nbsp;Create Fractal Group
+                                    </button>
+                                    <button class="button is-large is-info" ng-click='clearNewGrp();'>
+                                        <i class="fa fa-times"></i>&nbsp;Cancel
                                     </button>
                                 </div>
                             </div>

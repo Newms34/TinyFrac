@@ -6,13 +6,6 @@ app.factory('userFact', function ($http, $log) {
                 return s;
             });
         },
-        getCharsFromAPI(k) {
-            return $http.put('/user/addByAPI?k='+k).then(function(s){
-                return s;
-            }).catch(function(e){
-                return e;
-            })
-        },
         newUser(o) {
             return $http.post('/user/new', o).then(function (r) {
                 return r;
@@ -45,6 +38,24 @@ app.factory('userFact', function ($http, $log) {
         },
         nameCheck(n) {
             return $http.get('/user/nameOkay?name=' + n).then(function (r) {
+                return r;
+            })
+        },
+        getCharsFromAPI(k) {
+            console.log('GETTING CHARS USING API KEY',k)
+            return $http.put('/user/addByAPI?k='+k).then(function(s){
+                return s;
+            }).catch(function(e){
+                return e;
+            })
+        },
+        removeChar(c){
+            return $http.delete('/user/char?c='+c._id).then(function(s){
+                return s;
+            })
+        },
+        chFracLvl(l){
+            return $http.put('/user/fracManual?l='+l).then(function(r){
                 return r;
             })
         }

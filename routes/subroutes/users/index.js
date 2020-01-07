@@ -234,7 +234,7 @@ const routeExp = function (io, mongoose) {
             // })
             req.user.chars = r.data.map(c => {
                 const subProfOpts = c.specializations.pve.map(sp=>specializations.elites.find(q=>q.id==sp.id)).filter(f=>!!f);
-                console.log(c.name,subProfOpts);
+                // console.log(c.name,subProfOpts);
                 const chr = {
                         name: c.name,
                         prof: c.profession,
@@ -249,21 +249,42 @@ const routeExp = function (io, mongoose) {
                 return chr;
             });
             // res.send(r.data);
-            req.user.save((e, s) => {
-                res.send('refresh');
+            //now, we need the user's fractal lvl
+            axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.query.k).then(r=>{
+                req.user.fracLvl = r.data.fractal_level;
+                req.user.save((e, s) => {
+                    res.send('refresh');
+                })
+            }).catch(e=>{
+                console.log('fl err',e)
+                res.status(400).send('err')
             })
+        }).catch(e=>{
+            console.log('getChar err',e,'key was',req.query.k)
+            res.status(400).send('err')
         })
     })
-    router.put('/fracLevel', this.authbit, (req, res, next) => {
-        axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.query.k).then(r => {
-            req.user.fracLvl = r.data.fractal_level;
-            req.user.save((e, s) => {
-                res.send('refresh');
-            })
-        })
-    })
+    // router.put('/fracLevel', this.authbit, (req, res, next) => {
+    //     axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.query.k).then(r => {
+    //         req.user.fracLvl = r.data.fractal_level;
+    //         req.user.save((e, s) => {
+    //             res.send('refresh');
+    //         })
+    //     })
+    // })
     //manual gw2 account stuff (if user wants!)
-    /* TO BE ADDED */
+    router.delete('/char',this.authbit,(req,res,next)=>{
+        req.user.chars = req.user.chars.filter(q=>q._id!=req.query.c);
+        req.user.save((e,s)=>{
+            res.send('refresh')
+        })
+    })
+    router.put('/fracManual',this.authbit,(req,res,next)=>{
+        req.user.fracLvl = req.query.l|| req.user.fracLvl;
+        req.user.save((e,s)=>{
+            res.send('refresh')
+        })
+    })
     //mod stuff
     router.get('/users', this.authbit, this.isMod, (req, res, next) => {
         mongoose.model('User').find({}).lean().exec(function (err, usrs) {

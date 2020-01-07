@@ -249,12 +249,50 @@ app.controller('dash-cont', ($scope, $http, $q, userFact, $log) => {
     // $log.debug("Dashboard ctrl registered")
     $scope.refUsr = $scope.$parent.refUsr;
     $scope.refUsr();
-    $scope.getCharsFromAPI = a =>{
-        userFact.getCharsFromAPI(a).then(r=>{
+    $scope.getCharsFromAPI = () =>{
+        console.log('trying to use key',$scope.apiKey)
+        userFact.getCharsFromAPI($scope.apiKey).then(r=>{
+            console.log('getUsers Response',r)
+            if(!status|| status==400){
+                throw new Error('badApi')
+            }
             $scope.refUsr();
         }).catch(e=>{
-            bulmabox.alert('API Error','There was an error with your API key. Make sure you have correct permissions, then retry.')
+            console.log('getUsers Err',e)
+            bulmabox.alert('API Error','There was an error with your API key. Make sure you have a valid key with correct permissions, then retry.')
         })
+    }
+    $scope.addChar = ()=>{
+        
+    }
+    $scope.removeChar = c =>{
+        const descStr = `${c.race=='Asura'?'an':'a'} ${c.race} ${c.subProf||c.prof}`
+        bulmabox.confirm('<i class="fa fa-question-circle"></i>&nbsp;Remove Character',`Are you sure you wish to remove ${c.name} (${descStr})?`,r=>{
+            if(!!r){
+                userFact.removeChar(c).then(r=>{
+                    bulmabox.alert('Removed!',`You've removed ${c.name}!`);
+                })
+            }
+        })
+    }
+    $scope.explAPI = ()=>{
+        bulmabox.alert('API Keys',`<strong>Huh?:</strong> An API (Application Programming Interface &#129299) is a special way for different computer programs/sites to talk to each other. Guild Wars 2/ArenaNet provides these as a way for 3rd-party applications to communicate with the game engine. <br><br>
+        <strong>So... What's it do?:</strong> Basically, the API key allows me (Healy Unit) to automatically get certain information about your characters (such as their level/profession/race) and automatically fill in the correct "spots" without you having to type it all in!<br><br>
+        <strong>But is it safe?:</strong> Above all, the GW2 API is <i>read-only</i>. In other words, while I could potentially <i>see</i> that you have an Eternity, I can't <i>do</i> anything with that info. Almost all major GW2 fansites (gw2efficiency, for example) use API keys in some format.<br><br>
+        <strong><i class="fa fa-hand-o-right wiggle" title="if you're sure!"></i>&nbsp;Okay, I'm convinced!:</strong> Great! Just head on over to <a href="https://account.arena.net/">https://account.arena.net/</a> and sign in (this is an official site, so don't worry). Then click the Applications tab, and click the "New Key" button if you don't already have an API key. Then click the copy button (<i class="fa fa-files-o"></i>) button to copy your key to the clipboard. Finally, paste that here and click the "Use API Key" button.<br><br>
+        <strong>I still don't feel safe:</strong> Fair enough. Security is a pretty big concern these days. Feel free to click the "Manage Characters (Manual)" button above and enter your characters manually.`,{okay:{txt:'Got it!'}})
+    }
+    //fracLvl manual adjust stuff
+    $scope.fracTimer = null;
+    $scope.chFracTimer = ()=>{
+        if(!!$scope.fracTimer){
+            clearTimeout($scope.fracTimer);
+        }
+        $scope.fracTimer = setTimeout(function(){
+            userFact.chFracLvl($scope.user.fracLvl).then(r=>{
+                //do nuffin
+            })
+        },500)
     }
 });
 const countDups = (arr, p) => {
@@ -275,36 +313,72 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
     // $log.debug("Dashboard ctrl registered")
     $scope.refUsr = $scope.$parent.refUsr;
     $scope.refUsr();
-    $scope.refGrps = ()=>{
-        $http.get('/groups/group').then(r=>{
+    $scope.refGrps = () => {
+        $http.get('/groups/group').then(r => {
             console.log(r.data)
             $scope.groups = r.data;
         })
     }
     $scope.newGrp = {};
-    socket.on('refreshGrpById',u=>{
+    socket.on('refreshGrpById', u => {
         $scope.refGrps();
     });
-    $scope.submitNewGrp = ()=>{
-        if(!$scope.newGrp.times || !$scope.newGrp.levels ||!$scope.newGrp.char ){
-            return bulmabox.alert('Missing Info',`Hey! You need to at least tell us when your group's gonna meet and what levels you're gonna do.<br> In addition, you need to pick the character you wanna participate with.`);
-        }else{
-            $http.post('/groups/group',$scope.newGrp).then(r=>{
+    $scope.submitNewGrp = () => {
+        if (!$scope.newGrp.times || !$scope.newGrp.levels || !$scope.newGrp.char) {
+            return bulmabox.alert('Missing Info', `Hey! You need to at least tell us when your group's gonna meet and what levels you're gonna do.<br> In addition, you need to pick the character you wanna participate with.`);
+        } else {
+            $http.post('/groups/group', $scope.newGrp).then(r => {
                 console.log(r);
-                $scope.makinGroup=false;
+                $scope.makinGroup = false;
                 $scope.$digest();
             })
         }
     }
-    $scope.toggleGrpMember = d =>{
-        const char  = $scope.isGrpMember[0];
-        $http.put('/groups/member',{grpId:d}).then(r=>{
-            console.log(r);
+    $scope.addGrp = d => {
+        console.log(d);
+        const char = $scope.isGrpMember[0];
+        const otherOpts = $scope.$parent.$parent.user.chars.map(q=>{
+            return `<option value='${q.name}'>${q.name} (${q.race} ${q.subProf||q.prof})</option>`;
+        }).join('');
+        bulmabox.custom('Join Group',`
+        What character do you wanna join this group with?:
+        <p class="select">
+        <select id='join-grp-select'>
+            <option selected disabled class='has-text-grey' value=''>Which character do you wanna join with?</option>
+            ${otherOpts}
+        </select>
+        </p>
+        `,function(r){
+            const choiceName = document.querySelector('#join-grp-select').value,
+            choice = $scope.$parent.$parent.user.chars.find(a=>a.name==choiceName);
+            console.log('USER PICKED',choice,'FOR GROUP',d,'BUT IM NOT GONNA DO ANYTHING WITH IT SO THERE')
+            $http.put('/groups/member', { grpId: d,char:choice}).then(r => {
+                console.log(r);
+            })
+        },`<button class='button is-info' onclick='bulmabox.runCb(bulmabox.params.cb,true)'>Got it!</button>`)
+    }
+    $scope.removeGrp = d => {
+        bulmabox.confirm('Leave Group','Are you sure you wish to leave this group?',function(r){
+            if(!!r){
+                const char = $scope.isGrpMember(d)[0];
+                console.log('wanna remove member',char);
+                // return false;
+                $http.delete('/groups/member', { grpId: d, char:char}).then(r => {
+                    console.log(r);
+                })
+            }
         })
     }
-    $scope.isGrpMember = (grp)=>{
-        const simpUserChars = $scope.user.chars.map(q=>q.name.toLowerCase());
-        return grp.members.map(q=>q.name.toLowerCase()).filter(a=>simpUserChars.includes(a)).length;
+    $scope.clearNewGrp = ()=>{
+        $scope.newGrp =  {};
+        $scope.makinGroup=false;
+    }
+    $scope.isGrpMember = (grp) => {
+        const user = $scope.user || $scope.$parent.user || $scope.$parent.$parent.user;
+        const simpUserChars = user.chars.map(q => q.name.toLowerCase());
+        // console.log('$SCOPE HERE',$scope.$parent.$parent.user,simpUserChars,grp.members.map(q=>q.name.toLowerCase()).filter(cig=>simpUserChars.includes(cig)))
+        // return grp.members.map(q => q.name.toLowerCase()).filter(a => simpUserChars.includes(a)).length;
+        return grp.members.map(q=>q.name.toLowerCase()).filter(cig=>simpUserChars.includes(cig));
     }
     $scope.refGrps();
 });
@@ -491,7 +565,7 @@ app.controller('main-cont', function ($scope, $http, $state, userFact, $log) {
     socket.on('refreshById',u=>{
         userFact.getUser().then(r => {
             $scope.user = r.data;            
-            $scope.$apply();
+            // $scope.$apply();
         }); 
     });
 }).filter('numToDate', function () {
@@ -590,13 +664,6 @@ app.factory('userFact', function ($http, $log) {
                 return s;
             });
         },
-        getCharsFromAPI(k) {
-            return $http.put('/user/addByAPI?k='+k).then(function(s){
-                return s;
-            }).catch(function(e){
-                return e;
-            })
-        },
         newUser(o) {
             return $http.post('/user/new', o).then(function (r) {
                 return r;
@@ -629,6 +696,24 @@ app.factory('userFact', function ($http, $log) {
         },
         nameCheck(n) {
             return $http.get('/user/nameOkay?name=' + n).then(function (r) {
+                return r;
+            })
+        },
+        getCharsFromAPI(k) {
+            console.log('GETTING CHARS USING API KEY',k)
+            return $http.put('/user/addByAPI?k='+k).then(function(s){
+                return s;
+            }).catch(function(e){
+                return e;
+            })
+        },
+        removeChar(c){
+            return $http.delete('/user/char?c='+c._id).then(function(s){
+                return s;
+            })
+        },
+        chFracLvl(l){
+            return $http.put('/user/fracManual?l='+l).then(function(r){
                 return r;
             })
         }

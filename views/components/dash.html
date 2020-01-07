@@ -1,8 +1,55 @@
 <div ng-controller='dash-cont' wait-for-data='$parent.user,topicObjs,activeLessons'>
-    <!-- REMOVED: postrender-action="getAll()" -->
     <div class="message has-background-tiny-light">
         <div class="message-header"> TINY Characters </div>
         <div class="message-body blocky is-fullwidth">
+            <div class="is-fullwidth columns is-multiline">
+                <div class="is-italic has-text-white column is-full">Wanna add characters or adjust your fractal level? Do that here!</div>
+                <button class="column is-two-fifths button is-large is-link" ng-click='apiKeyBox=!apiKeyBox;manualManage=false'>Use API Key (Automatic)</button>
+                <div class="column is-one-fifth"></div>
+                <button class="column is-two-fifths button is-large is-link" ng-click='apiKeyBox=false;manualManage=!manualManage'>Manage Characters (Manual)</button>
+                <div class="column is-full" ng-if='apiKeyBox||manualManage'>
+                    <hr>
+                </div>
+                <div class="column is-full" ng-show='apiKeyBox'>
+                    <div class="is-fullwidth has-text-white is-italic">
+                        Use this to automatically add your characters and fill-in your fractal level.
+                    </div>
+                    <br>
+                    <div class="columns">
+                        <div class="column is-four-fifths field">
+                            <p class="control has-icons-left has-icons-right">
+                                <input class="input" type="text" placeholder="Enter a Guild Wars 2 API key" ng-model='apiKey'>
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-key"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="column is-one-fifth">
+                            <button class="button is-info is-pulled-left" ng-click='explAPI();'>?</button>
+                        </div>
+                    </div>
+                    <button class="button is-info" ng-disabled='!apiKey' ng-click='getCharsFromAPI()'>Use API Key</button>
+                </div>
+                <div class="column is-full columns is-multiline message message-body" ng-show='manualManage'>
+                    <div class="notification column is-one-fifth has-background-grey-lighter">
+                        Fractal Level
+                    </div>
+                    <div class="column is-four-fifths">
+                        <div class="is-fullwidth is-italic">
+                            Change your maximum fractal level here.
+                        </div>
+                        <input type="number" min='0' max='100' class="number" ng-model='user.fracLvl' ng-keyup='chFracTimer()'>
+                    </div>
+                    <div class="column is-full"></div>
+                    <div class="notification column is-one-fifth has-background-grey-lighter">
+                        Add Character
+                    </div>
+                    <div class="column is-four-fifths">
+                        ADD CHAR DIALOG
+                    </div>
+                    <div class="column is-full"></div>
+                </div>
+            </div>
             <table class="table is-fullwidth has-text-white has-background-tiny-army">
                 <thead class='has-text-white'>
                     <tr>
@@ -26,14 +73,14 @@
                 <tbody>
                     <tr ng-repeat='chr in user.chars'>
                         <td>
-                            <img src="{{chr.icon}}" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">
+                            <img src="./img/profs/{{(chr.subProf||chr.prof).toLowerCase()}}.png" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">
                             <img src="./img/races/{{chr.race.toLowerCase()}}.png" alt="{{chr.race}}" title="{{chr.race}}">
                         </td>
                         <td>{{chr.name}}</td>
                         <td>{{chr.subProf||chr.prof}}</td>
                         <!-- <td><span ng-if='chr.race!="Asura"' title="This character is not an asura! Please check with your fellow [TINY]s if it's still okay to use this character (up to the group)!"><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.race}}</td> -->
                         <td><span ng-if='chr.level!=80' title="This character is not max level! Most fractal groups will not accept sub-max-level characters."><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.level}}</td>
-                        <td><input type="checkbox" ng-model='chr.forFracs' id='{{$index}}-chr-chk'>&nbsp;<label for="{{$index}}-chr-chk">Available for fractals</label></td>
+                        <td><button class="button is-danger" title='Remove {{chr.name}}' ng-click='removeChar(chr)'><i class="fa fa-trash"></i></button></td>
                     </tr>
                 </tbody>
             </table>

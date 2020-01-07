@@ -12,7 +12,7 @@ app.controller('main-cont', function ($scope, $http, $state, userFact, $log) {
     socket.on('refreshById',u=>{
         userFact.getUser().then(r => {
             $scope.user = r.data;            
-            $scope.$apply();
+            // $scope.$apply();
         }); 
     });
 }).filter('numToDate', function () {

@@ -45,3 +45,24 @@ body {
 .smol-img{
   width:20px;
 }
+.wiggle{
+  animation:wobbl 1s linear infinite;
+}
+@keyframes wobbl{
+  0% {
+    transform: rotateZ(0deg);
+  }
+  10% {
+    transform: rotateZ(15deg);
+  }
+  20% {
+    transform: rotateZ(0deg);
+  }
+  30% {
+    transform: rotateZ(-15deg);
+  }
+  40% {
+    transform: rotateZ(0deg);
+  }
+
+}

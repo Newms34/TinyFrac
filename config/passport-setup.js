@@ -130,7 +130,7 @@ passport.use('local-login', new LocalStrategy({
                 usrFnd.wrongAttempts = 0;
                 let oldLastLogin = usrFnd.lastLogin ||0;
                 usrFnd.lastLogin = Date.now();
-                console.log('USER IS',usrFnd,'END OF USR INFO')
+                // console.log('USER IS',usrFnd,'END OF USR INFO')
                 usrFnd.save((errsv, usv) => {
                     // all is well, return successful user
                     console.log(errsv)

@@ -1,12 +1,5 @@
 node_modules
 npm-debug.log
 .DS_Stores
-remoteSeed
-sparky.json
-NOTES
+NOTES.txt
 config/keys.json
-config/sparky.json
-.gcloudignore
-app.yaml
-jest.config.js
-tests/
