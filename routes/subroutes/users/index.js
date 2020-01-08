@@ -476,7 +476,20 @@ const routeExp = function (io, mongoose) {
             });
         }
     });
-
+    //supermod stuff
+    router.get('/confirm',this.authbit,this.isSuperMod,(req,res,next)=>{
+        mongoose.model('User').findOne({
+            user:req.query.u
+        },(err,u)=>{
+            if(err||!u){
+                return res.status(400).send('err');
+            }
+            u.confirmed = true;
+            u.save((e,s)=>{
+                res.send('Confirmed '+u.user);
+            })
+        });
+    })
     return router;
 };
 
