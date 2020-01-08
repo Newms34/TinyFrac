@@ -99,6 +99,7 @@
                     <div class="column is-full"></div>
                 </div>
             </div>
+            <div class="notification has-text-white has-background-tiny-army">Your current fractal level: {{user.fracLvl}}</div>
             <table class="table is-fullwidth has-text-white has-background-tiny-army">
                 <thead class='has-text-white'>
                     <tr>
@@ -128,6 +129,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr ng-if='!user || !user.chars || !user.chars.length'>
+                        <td colspan="5" class='has-text-centered has-text-grey-light'><i class="fa fa-exclamation-triangle"></i>&nbsp;No Chars! Use an API key, or add your characters manually above!</td>
+                    </tr>
                     <tr ng-repeat='chr in user.chars|orderBy: chrSort.col:chrSort.rev'>
                         <td>{{chr.name}}</td>
                         <td><img src="./img/profs/{{(chr.subProf||chr.prof).toLowerCase()}}.png" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">{{chr.subProf||chr.prof}}</td>
