@@ -7,7 +7,7 @@ body {
   width: 100%;
   margin: 0;
   height: 100%; // padding-top: 40px;
-  background: #ddd;
+  background: #313;
 }
 
 #main-box {
@@ -65,4 +65,7 @@ body {
     transform: rotateZ(0deg);
   }
 
+}
+.pokey{
+  cursor:pointer;
 }

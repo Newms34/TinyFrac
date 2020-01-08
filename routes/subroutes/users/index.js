@@ -279,6 +279,21 @@ const routeExp = function (io, mongoose) {
             res.send('refresh')
         })
     })
+    router.put('/char',this.authbit,(req,res,next)=>{
+        const missingInfo = ['name','prof','race','level'].filter(q=>!req.body[q]);
+        if(missingInfo && missingInfo.length){
+            return res.status(400).send('err')
+        }
+        if(req.user.chars.find(q=>q.name.toLowerCase()==req.body.name)){
+            return res.status(400).send('duplicate');
+        }
+        req.user.chars.push(req.body);
+        req.user.save((e,s)=>{
+            console.log('ERR',e,'SAVE',s)
+            res.send('refresh');
+        })
+        // res.send('noNewChars');
+    })
     router.put('/fracManual',this.authbit,(req,res,next)=>{
         req.user.fracLvl = req.query.l|| req.user.fracLvl;
         req.user.save((e,s)=>{

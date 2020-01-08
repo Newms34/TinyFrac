@@ -54,6 +54,12 @@ app.factory('userFact', function ($http, $log) {
                 return s;
             })
         },
+        addChar(c){
+            return $http.put('/user/char',c).then(function(s){
+                console.log('RESPONSE FROM addchar',s)
+                return s;
+            })
+        },
         chFracLvl(l){
             return $http.put('/user/fracManual?l='+l).then(function(r){
                 return r;

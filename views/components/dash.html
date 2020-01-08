@@ -1,6 +1,6 @@
 <div ng-controller='dash-cont' wait-for-data='$parent.user,topicObjs,activeLessons'>
     <div class="message has-background-tiny-light">
-        <div class="message-header"> TINY Characters </div>
+        <div class="message-header has-background-link"> TINY Characters </div>
         <div class="message-body blocky is-fullwidth">
             <div class="is-fullwidth columns is-multiline">
                 <div class="is-italic has-text-white column is-full">Wanna add characters or adjust your fractal level? Do that here!</div>
@@ -45,7 +45,56 @@
                         Add Character
                     </div>
                     <div class="column is-four-fifths">
-                        ADD CHAR DIALOG
+                        <button class="button is-large is-link" ng-show='!addingChar' ng-click='addingChar=true'><i class="fa fa-plus"></i>&nbsp; Add a character</button>
+                        <div class="is-fullwidth columns is-multiline" ng-show='addingChar'>
+                            <!-- ACTUAL CHAR FORM GOES HERE (needs: name, prof, subprof, race, lvl). So 1 text field, 1 number field, 1 or 2 select fields -->
+                            <div class="notification has-background-grey-darker has-text-white column is-one-fifth">
+                                Name
+                            </div>
+                            <div class="column is-four-fifths">
+                                <input type="text" class="input" ng-model='newChar.name' placeholder="What's your character's name?">
+                            </div>
+                            <div class="column is-full">
+                            </div>
+                            <div class="notification has-background-grey-darker has-text-white column is-one-fifth">
+                                Level
+                            </div>
+                            <div class="column is-four-fifths">
+                                <input type="number" min='0' max='80' class="input" ng-model='newChar.level'>
+                            </div>
+                            <div class="column is-full">
+                            </div>
+                            <div class="notification has-background-grey-darker has-text-white column is-one-fifth">
+                                Race
+                            </div>
+                            <div class="column is-four-fifths">
+                                <p class="select">
+                                    <select ng-model='newChar.race' ng-options='rc as rc for rc in races'>
+                                        <option value="" selected disabled>Pick a race!</option>
+                                    </select>
+                                </p>
+                                <img src="./img/races/{{newChar.race.toLowerCase()}}.png" alt="">
+                            </div>
+                            <div class="column is-full">
+                            </div>
+                            <div class="notification has-background-grey-darker has-text-white column is-one-fifth">
+                                Profession
+                            </div>
+                            <div class="column is-four-fifths">
+                                <p class="select">
+                                    <select ng-model='newChar.profRaw' ng-options='rp as rp.label for rp in rawProfs'>
+                                        <option value="" selected disabled>Pick a profession (and optional sub-profession)!</option>
+                                    </select>
+                                </p>
+                                <img src="./img/profs/{{(newChar.profRaw.subProf||newChar.profRaw.prof).toLowerCase()}}.png" alt="">
+                            </div>
+                            <div class="column is-full">
+                            </div>
+                            <div class="column is-full">
+                                <button class="button is-large is-link" ng-click='addChar()'><i class="fa fa-check"></i>&nbsp;Add em!</button>
+                                <button class="button is-large is-info" ng-click='clearNewChar()'><i class="fa fa-times"></i>&nbsp;Nevermind...</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="column is-full"></div>
                 </div>
@@ -53,31 +102,38 @@
             <table class="table is-fullwidth has-text-white has-background-tiny-army">
                 <thead class='has-text-white'>
                     <tr>
-                        <th>
-                            &nbsp;
-                        </th>
-                        <th>
+                        <th ng-click='sortEmBy("name")' class='pokey'>
+                            <i class="fa fa-caret-up" ng-if='chrSort.rev && chrSort.col=="name"'></i>
+                            <i class="fa fa-caret-down" ng-if='!chrSort.rev && chrSort.col=="name"'></i>
                             Name:
                         </th>
-                        <th>
+                        <th ng-click='sortEmBy(["prof","subProf"])' class='pokey'>
+                            <i class="fa fa-caret-up" ng-if='chrSort.rev && chrSort.col.toString()=="prof,subprof"'></i>
+                            <i class="fa fa-caret-down" ng-if='!chrSort.rev && chrSort.col.toString()=="prof,subProf"'></i>
                             Profession
                         </th>
-                        <th>
+                        <th ng-click='sortEmBy("race")' class='pokey'>
+                            <i class="fa fa-caret-up" ng-if='chrSort.rev && chrSort.col=="race"'></i>
+                            <i class="fa fa-caret-down" ng-if='!chrSort.rev && chrSort.col=="race"'></i>
+                            Race
+                        </th>
+                        <th ng-click='sortEmBy("level")' class='pokey'>
+                            <i class="fa fa-caret-up" ng-if='chrSort.rev && chrSort.col=="level"'></i>
+                            <i class="fa fa-caret-down" ng-if='!chrSort.rev && chrSort.col=="level"'></i>
                             Level
                         </th>
                         <th>
-                            Actions
+                            Remove
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat='chr in user.chars'>
-                        <td>
-                            <img src="./img/profs/{{(chr.subProf||chr.prof).toLowerCase()}}.png" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">
-                            <img src="./img/races/{{chr.race.toLowerCase()}}.png" alt="{{chr.race}}" title="{{chr.race}}">
-                        </td>
+                    <tr ng-repeat='chr in user.chars|orderBy: chrSort.col:chrSort.rev'>
                         <td>{{chr.name}}</td>
-                        <td>{{chr.subProf||chr.prof}}</td>
+                        <td><img src="./img/profs/{{(chr.subProf||chr.prof).toLowerCase()}}.png" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">{{chr.subProf||chr.prof}}</td>
+                        <td>
+                            <img src="./img/races/{{chr.race.toLowerCase()}}.png" alt="{{chr.race}}" title="{{chr.race}}">&nbsp;{{chr.race}}
+                        </td>
                         <!-- <td><span ng-if='chr.race!="Asura"' title="This character is not an asura! Please check with your fellow [TINY]s if it's still okay to use this character (up to the group)!"><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.race}}</td> -->
                         <td><span ng-if='chr.level!=80' title="This character is not max level! Most fractal groups will not accept sub-max-level characters."><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.level}}</td>
                         <td><button class="button is-danger" title='Remove {{chr.name}}' ng-click='removeChar(chr)'><i class="fa fa-trash"></i></button></td>
