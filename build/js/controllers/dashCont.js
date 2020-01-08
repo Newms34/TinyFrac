@@ -6,7 +6,7 @@ app.controller('dash-cont', ($scope, $http, $q, userFact, $log) => {
         console.log('trying to use key', $scope.apiKey)
         userFact.getCharsFromAPI($scope.apiKey).then(r => {
             console.log('getUsers Response', r)
-            if (!status || status == 400) {
+            if (!r.status || r.status == 400) {
                 throw new Error('badApi')
             }
             $scope.refUsr();
