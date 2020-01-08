@@ -119,6 +119,9 @@ const routeExp = function (io, mongoose) {
                 });
             } else {
                 if (usr && !usr.isBanned && !usr.locked) {
+                    if(!usr.confirmed){
+                        return res.status(400).send('unconf')
+                    }
                     req.session.passport = {
                         user: usr._id
                     };

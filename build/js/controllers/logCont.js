@@ -45,6 +45,8 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
             .catch(e => {
                 if (e.data.status == 'banned') {
                     return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Banned', `You've been banned by moderator ${e.data.usr}!`);
+                }else if(e.data='unconf'){
+                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons!`);
                 }
                 bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Error', "There's been some sort of error logging in. This is <i>probably</i> not an issue with your credentials. Blame the devs!");
                 $log.debug(e);
@@ -138,6 +140,8 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
                             }).catch(e => {
                                 if (e.data == 'duplicate') {
                                     bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
+                                }else if(e.data='unconf'){
+                                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons!`);
                                 }
                             });
                     }).catch(e => {

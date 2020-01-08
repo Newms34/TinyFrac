@@ -8,6 +8,7 @@ const usrSchema = new mongoose.Schema({
     salt: String,
     email: String,
     googleId: String,
+    confirmed:{type:Boolean,default:false,},
     lastAction: { type: Number, default: Date.now() },
     lastLogin: { type: Number, default: 0 },
     oldLastLogin: { type: Number, default: 0 },
