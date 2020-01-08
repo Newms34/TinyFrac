@@ -620,12 +620,14 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
                 if (e.data.status == 'banned') {
                     return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Banned', `You've been banned by moderator ${e.data.usr}!`);
                 }else if(e.data='unconf'){
-                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons!`);
+                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                    $state.go('appSimp.login')
                 }
                 bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Error', "There's been some sort of error logging in. This is <i>probably</i> not an issue with your credentials. Blame the devs!");
                 $log.debug(e);
             });
     };
+    $scope.nameOkay = true;
     $scope.checkUser = () => {
         if ($scope.checkTimer) {
             clearTimeout($scope.checkTimer);
