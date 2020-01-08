@@ -28,7 +28,7 @@ const usrSchema = new mongoose.Schema({
         default: false,
     },
     wrongAttempts: { type: Number, default: 0 },
-
+    isBanned:{type:Boolean,default:false}//well... are they?
 }, {
     collection: 'User'
 });

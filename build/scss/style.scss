@@ -69,3 +69,17 @@ body {
 .pokey{
   cursor:pointer;
 }
+.trunc-height-table{
+  max-height:100px;
+  overflow-y:scroll;
+}
+.button{
+  &.is-a-bit-dangerous{
+    background:#933;
+    color:#fff;
+    border-color:transparent;
+    &:hover{
+      background:#a44;
+    }
+  }
+}

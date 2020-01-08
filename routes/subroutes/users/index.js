@@ -303,56 +303,6 @@ const routeExp = function (io, mongoose) {
             res.send('refresh')
         })
     })
-    //mod stuff
-    router.get('/users', this.authbit, this.isMod, (req, res, next) => {
-        mongoose.model('User').find({}).lean().exec(function (err, usrs) {
-            if (err || !usrs || !usrs.length) {
-                return res.status(400).send('noUsrs');
-            }
-            // console.log('filtering out',req.user.user);
-            const safeUsrs = usrs.filter(uf => {
-                // return Math.random()>0.5
-                return uf.user !== req.user.user;
-            }).map(q => {
-                return {
-                    user: q.user,
-                    displayName: q.displayName,
-                    demo: q.isDemoUser,
-                    interests: q.interests,
-                    teaching: q.teaching,
-                    mod: q.mod,
-                    isBanned: q.isBanned
-                };
-            });
-            res.send(safeUsrs);
-        });
-    });
-    router.put('/toggleBan', this.authbit, this.isMod, (req, res, next) => {
-        mongoose.model('User').findOne({
-            user: req.body.user
-        }, function (err, usr) {
-            // console.log('CHANGING BAN STATUS OF', req.body.user, 'WHO IS', usr.user);
-            if (!!usr.isBanned) {
-                usr.isBanned = null;
-            } else {
-                usr.isBanned = req.user.user;
-            }
-            usr.save(function (err, resp) {
-                mongoose.model('User').find({}, function (err, usrs) {
-                    const badStuff = ['msgs', 'salt', 'googleId', 'pass'];
-                    res.send(_.cloneDeep(usrs).map(u => {
-                        //we wanna remove all the sensitive info
-                        badStuff.forEach(d => {
-                            if (u[d]) {
-                                delete u[d];
-                            }
-                        });
-                        return u;
-                    }));
-                });
-            });
-        });
-    });
     //password stuff    
     router.post('/editPwd', this.authbit, (req, res, next) => {
         mongoose.model('User').findOne({
@@ -477,9 +427,9 @@ const routeExp = function (io, mongoose) {
         }
     });
     //supermod stuff
-    router.get('/confirm',this.authbit,this.isSuperMod,(req,res,next)=>{
+    router.put('/confirm',this.authbit,this.isSuperMod,(req,res,next)=>{
         mongoose.model('User').findOne({
-            user:req.query.u
+            user:req.body.user
         },(err,u)=>{
             if(err||!u){
                 return res.status(400).send('err');
@@ -490,6 +440,49 @@ const routeExp = function (io, mongoose) {
             })
         });
     })
+    router.get('/users', this.authbit, this.isSuperMod, (req, res, next) => {
+        mongoose.model('User').find({}).lean().exec(function (err, usrs) {
+            if (err || !usrs || !usrs.length) {
+                return res.status(400).send('noUsrs');
+            }
+            // console.log('filtering out',req.user.user);
+            const safeUsrs = usrs.filter(uf => {
+                // return Math.random()>0.5
+                return uf.user !== req.user.user;
+            }).map(q => {
+                delete q.salt;
+                delete q.pass;
+                return q;
+            });
+            res.send(safeUsrs);
+        });
+    });
+    router.put('/toggleBan', this.authbit, this.isSuperMod, (req, res, next) => {
+        mongoose.model('User').findOne({
+            user: req.body.user
+        }, function (err, usr) {
+            // console.log('CHANGING BAN STATUS OF', req.body.user, 'WHO IS', usr.user);
+            if (!!usr.isBanned) {
+                usr.isBanned = false;
+            } else {
+                usr.isBanned = true;
+            }
+            usr.save(function (err, resp) {
+                mongoose.model('User').find({}, function (err, usrs) {
+                    const badStuff = ['msgs', 'salt', 'googleId', 'pass'];
+                    res.send(_.cloneDeep(usrs).map(u => {
+                        //we wanna remove all the sensitive info
+                        badStuff.forEach(d => {
+                            if (u[d]) {
+                                delete u[d];
+                            }
+                        });
+                        return u;
+                    }));
+                });
+            });
+        });
+    });
     return router;
 };
 

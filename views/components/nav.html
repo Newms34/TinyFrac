@@ -12,7 +12,7 @@
     </div>
     <div class="navbar-menu" ng-class='{"is-active":mobActive}' ng-click='mobActive=false'>
         <div class="navbar-start">
-            <a class="navbar-item has-text-white" ng-repeat ='nv in navEls' href='#' ng-class='{"has-background-info has-text-black no-poke":currState==nv.st}' ng-click='goState(nv.st)'>
+            <a class="navbar-item has-text-white" ng-if='!nv.protected || ($parent.user && $parent.user.superMod)' ng-repeat ='nv in navEls' href='#' ng-class='{"has-background-info has-text-black no-poke":currState==nv.st}' ng-click='goState(nv.st)'>
                 <h3><i class="fa fa-{{nv.icon}}"></i>&nbsp;{{nv.text}}</h3>
             </a>
         </div>

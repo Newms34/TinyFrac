@@ -71,6 +71,10 @@ app
                 url: '/group',
                 templateUrl: 'components/group.html'
             })
+            .state('app.mod', {
+                url: '/mod',
+                templateUrl: 'components/mod.html'
+            })
             //SIMPLE (unauth'd: login, register, forgot, 404, 500,reset)
             .state('appSimp', {
                 abstract: true,
@@ -248,6 +252,7 @@ function postrenderAction($timeout) {
 app.controller('dash-cont', ($scope, $http, $q, userFact, $log) => {
     // $log.debug("Dashboard ctrl registered")
     $scope.refUsr = $scope.$parent.refUsr;
+    
     $scope.refUsr();
     $scope.getCharsFromAPI = () => {
         console.log('trying to use key', $scope.apiKey)
@@ -314,7 +319,16 @@ app.controller('dash-cont', ($scope, $http, $q, userFact, $log) => {
         bulmabox.alert('API Keys', `<strong>Huh?:</strong> An API (Application Programming Interface &#129299) is a special way for different computer programs/sites to talk to each other. Guild Wars 2/ArenaNet provides these as a way for 3rd-party applications to communicate with the game engine. <br><br>
         <strong>So... What's it do?:</strong> Basically, the API key allows me (Healy Unit) to automatically get certain information about your characters (such as their level/profession/race) and automatically fill in the correct "spots" without you having to type it all in!<br><br>
         <strong>But is it safe?:</strong> Above all, the GW2 API is <i>read-only</i>. In other words, while I could potentially <i>see</i> that you have an Eternity, I can't <i>do</i> anything with that info. Almost all major GW2 fansites (gw2efficiency, for example) use API keys in some format.<br><br>
-        <strong><i class="fa fa-hand-o-right wiggle" title="if you're sure!"></i>&nbsp;Okay, I'm convinced!:</strong> Great! Just head on over to <a href="https://account.arena.net/">https://account.arena.net/</a> and sign in (this is an official site, so don't worry). Then click the Applications tab, and click the "New Key" button if you don't already have an API key. Then click the copy button (<i class="fa fa-files-o"></i>) button to copy your key to the clipboard. Finally, paste that here and click the "Use API Key" button.<br><br>
+        <strong><i class="fa fa-hand-o-right wiggle" title="if you're sure!"></i>&nbsp;Okay, I'm convinced!:</strong> Great!
+        <ol class="contents">
+            <li>Head on over to <a href="https://account.arena.net/">https://account.arena.net/</a> and sign in (this is an official site, so don't worry).</li>
+            <li>Click the Applications tab.</li>
+            <li>Click the "New Key" button if you don't already have an API key listed.</li>
+            <li>You'll need the <code>progression</code>, <code>account</code>, and <code>characters</code> "permissions"</li>
+            <li>Click "Create API Key</li>
+            <li>Copy and paste that in the box here</li>
+            <li>Click the "Use API Key" button</li>
+        </ol><br>
         <strong>I still don't feel safe:</strong> Fair enough. Security is a pretty big concern these days. Feel free to click the "Manage Characters (Manual)" button above and enter your characters manually.`, { okay: { txt: 'Got it!' } })
     }
     //fracLvl manual adjust stuff
@@ -504,7 +518,7 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
     $scope.refUsr();
     $scope.refGrps = () => {
         $http.get('/groups/group').then(r => {
-            console.log(r.data)
+            console.log('REFD GRPS',r.data)
             $scope.groups = r.data;
         })
     }
@@ -519,7 +533,8 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
             $http.post('/groups/group', $scope.newGrp).then(r => {
                 console.log(r);
                 $scope.makinGroup = false;
-                $scope.$digest();
+                // $scope.$digest();
+                $scope.refGrps();
             })
         }
     }
@@ -542,7 +557,8 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
             choice = $scope.$parent.$parent.user.chars.find(a=>a.name==choiceName);
             console.log('USER PICKED',choice,'FOR GROUP',d,'BUT IM NOT GONNA DO ANYTHING WITH IT SO THERE')
             $http.put('/groups/member', { grpId: d,char:choice}).then(r => {
-                console.log(r);
+                // console.log(r);
+                $scope.refGrps();
             })
         },`<button class='button is-info' onclick='bulmabox.runCb(bulmabox.params.cb,true)'>Got it!</button>`)
     }
@@ -619,9 +635,9 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
             .catch(e => {
                 if (e.data.status == 'banned') {
                     return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Banned', `You've been banned by moderator ${e.data.usr}!`);
-                }else if(e.data='unconf'){
-                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
-                    $state.go('appSimp.login')
+                } else if (e.data = 'unconf') {
+                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                    return $state.go('appSimp.login');
                 }
                 bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Error', "There's been some sort of error logging in. This is <i>probably</i> not an issue with your credentials. Blame the devs!");
                 $log.debug(e);
@@ -656,12 +672,12 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
     $scope.checkPwdDup = () => {
         $scope.pwdNoDup = !$scope.pwd || !$scope.pwdDup || $scope.pwdDup !== $scope.pwd;
     }
-    $scope.pwdStrStars = [0,1,2,3,4,];
-    $scope.badPwds = ['password','pass','1234','123','admin','abc','abcd','pwd'];
-    $scope.pwdStr = {recs:[],score:0,maxScore:5,show:false}
+    $scope.pwdStrStars = [0, 1, 2, 3, 4,];
+    $scope.badPwds = ['password', 'pass', '1234', '123', 'admin', 'abc', 'abcd', 'pwd'];
+    $scope.pwdStr = { recs: [], score: 0, maxScore: 5, show: false }
     $scope.checkPwdStr = () => {
-        
-        if(!$scope.pwd){
+
+        if (!$scope.pwd) {
             return false;
         }
         const reqs = [{
@@ -676,22 +692,22 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
         }, {
             desc: 'Using at least one "special" character (@, !, $, etc.)',
             reg: '[@!\$\^_\*&]'
-        },{
-            desc:'Using at least 12 characters',
-            reg:'[\\w]{12}'
-        },{
-            desc:'Not using a bad password',
-            negate:true,
-            reg:['password','pass','1234','123','admin','abc','abcd','pwd'].map(q=>`(${q})`).join('|')
+        }, {
+            desc: 'Using at least 12 characters',
+            reg: '[\\w]{12}'
+        }, {
+            desc: 'Not using a bad password',
+            negate: true,
+            reg: ['password', 'pass', '1234', '123', 'admin', 'abc', 'abcd', 'pwd'].map(q => `(${q})`).join('|')
         }],
             badStuff = reqs.filter(re => { //stuff we're MISSINg
                 const reg = new RegExp(re.reg);
-                if(re.negate){
+                if (re.negate) {
                     return !!reg.test($scope.pwd);
                 }
                 return !reg.test($scope.pwd);
             });
-        $scope.pwdStr = {recs:badStuff,score:reqs.length-badStuff.length,maxScore:5,show:$scope.pwdStr.show}
+        $scope.pwdStr = { recs: badStuff, score: reqs.length - badStuff.length, maxScore: 5, show: $scope.pwdStr.show }
     }
     $scope.register = () => {
         if (!$scope.pwd || !$scope.pwdDup || !$scope.user) {
@@ -716,13 +732,17 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
                             }).catch(e => {
                                 if (e.data == 'duplicate') {
                                     bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
-                                }else if(e.data='unconf'){
-                                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons!`);
+                                } else if (e.data = 'unconf') {
+                                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                                    return $state.go('appSimp.login');
                                 }
                             });
                     }).catch(e => {
                         if (e.data == 'duplicate') {
                             bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
+                        }else if (e.data = 'unconf') {
+                            bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                            return $state.go('appSimp.login');
                         }
                     });
             });
@@ -773,6 +793,51 @@ app.controller('main-cont', function ($scope, $http, $state, userFact, $log) {
         return `${theDate.toLocaleDateString()} ${theDate.getHours() % 12}:${theDate.getMinutes().toString().length < 2 ? '0' + theDate.getMinutes() : theDate.getMinutes()} ${theDate.getHours() < 13 ? 'AM' : 'PM'}`;
     };
 });
+app.controller('mod-cont', ($scope, $state, $http, $q, userFact, $log) => {
+    // $log.debug("Dashboard ctrl registered")
+    $scope.refUsr = $scope.$parent.refUsr;
+    $scope.refUsr();
+    socket.on('refreshGrpById', u => {
+        $scope.refGrps();
+    });
+    $scope.refAllUsrs = ()=>{
+        const thisUser = ($scope.user && $scope.user.user)||($scope.$parent.user && $scope.$parent.user.user);
+        $http.get('/user/users').then(r=>{
+            console.log('thisUser',thisUser,r.data.map(q=>q.user))
+            $scope.users = r.data.filter(q=>q && q.user!=thisUser);
+        })
+    }
+    $scope.refAllUsrs();
+    setInterval(function(){
+        // console.log($scope.user||'NO USER!')
+        if(!($scope.user && $scope.user.superMod)&&!($scope.$parent.user && !$scope.$parent.user.superMod)){
+            $state.go('app.dash')
+            // console.log('NOT MOD')
+        }
+    },30);
+    $scope.toggleBan = u =>{
+        const title = u.isBanned?`Unban User`:`Ban User`,
+        msg = u.isBanned?`Are you sure you wish to unban the user ${u.user}? This will restore their access to TinyFracs.`:`Are you sure you wish to ban the user ${u.user}? This will revoke their access to TinyFracs!`;
+        bulmabox.confirm(title,msg,function(r){
+            if(!!r){
+                $http.put('/user/toggleBan',{user:u.user}).then(r=>{
+                    $scope.refAllUsrs();
+                })
+            }
+        })
+
+    }
+    $scope.confirmUser = u =>{
+        bulmabox.confirm('Confirm User',`Are you sure you wish to confirm the user ${u.user}? This action will give them normal (non-mod) access rights to TinyFrac, and is generally <i>not</i> reversable!`,function(r){
+            if(!!r){
+                $http.put('/user/confirm',{user:u.user}).then(r=>{
+                    $scope.refAllUsrs();
+                })
+            }
+        })
+    }
+});
+
 app.controller('nav-cont',function($scope,$http,$state, $log, userFact){
     $scope.currState = 'dash';
 	$scope.logout = function() {
@@ -793,11 +858,18 @@ app.controller('nav-cont',function($scope,$http,$state, $log, userFact){
     $scope.navEls = [{
         st:'dash',
         icon:'user-circle',
-        text:'Home'
+        text:'Account',
+        protected:false,
     },{
         st:'group',
         icon:'users',
-        text:'Group'
+        text:'Group',
+        protected:false,
+    },{
+        st:'mod',
+        icon:'users',
+        text:'Moderator',
+        protected:true,
     }];
     $scope.goState = s =>{
         $scope.currState = s;

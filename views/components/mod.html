@@ -1,0 +1,36 @@
+<div ng-controller='mod-cont'>
+    <div class="message has-background-tiny-light">
+        <div class="message-header has-background-link"> Mod Controls </div>
+        <div class="message-body blocky is-fullwidth">
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Characters</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-if='!users || !users.length'>
+                        <td colspan='3' class='has-text-centered has-text-grey-light'>
+                            No non-moderator users are currently signed up!
+                        </td>
+                    </tr>
+                    <tr ng-repeat='u in users'>
+                        <td>{{u.user}}</td>
+                        <td class='trunc-height-table' ng-show='u.chars && u.chars.length'>
+                            <div class="is-fullwidth" ng-repeat='chr in u.chars'>{{chr.name}}</div>
+                        </td>
+                        <td ng-show='!u.chars || !u.chars.length'>
+                            (none)
+                        </td>
+                        <td>
+                            <button class="button is-link" ng-click='confirmUser(u);' ng-show='!u.confirmed'><i class="fa fa-check"></i>&nbsp;Confirm</button>
+                            <button class="button is-a-bit-dangerous" ng-click='toggleBan(u);'><i class="fa fa-{{u.isBanned?'unlock':'lock'}}"></i>&nbsp;{{u.isBanned?'Unban':'Ban'}} User</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

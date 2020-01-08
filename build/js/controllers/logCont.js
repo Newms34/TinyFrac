@@ -45,9 +45,9 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
             .catch(e => {
                 if (e.data.status == 'banned') {
                     return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Banned', `You've been banned by moderator ${e.data.usr}!`);
-                }else if(e.data='unconf'){
-                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
-                    $state.go('appSimp.login')
+                } else if (e.data = 'unconf') {
+                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                    return $state.go('appSimp.login');
                 }
                 bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Error', "There's been some sort of error logging in. This is <i>probably</i> not an issue with your credentials. Blame the devs!");
                 $log.debug(e);
@@ -82,12 +82,12 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
     $scope.checkPwdDup = () => {
         $scope.pwdNoDup = !$scope.pwd || !$scope.pwdDup || $scope.pwdDup !== $scope.pwd;
     }
-    $scope.pwdStrStars = [0,1,2,3,4,];
-    $scope.badPwds = ['password','pass','1234','123','admin','abc','abcd','pwd'];
-    $scope.pwdStr = {recs:[],score:0,maxScore:5,show:false}
+    $scope.pwdStrStars = [0, 1, 2, 3, 4,];
+    $scope.badPwds = ['password', 'pass', '1234', '123', 'admin', 'abc', 'abcd', 'pwd'];
+    $scope.pwdStr = { recs: [], score: 0, maxScore: 5, show: false }
     $scope.checkPwdStr = () => {
-        
-        if(!$scope.pwd){
+
+        if (!$scope.pwd) {
             return false;
         }
         const reqs = [{
@@ -102,22 +102,22 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
         }, {
             desc: 'Using at least one "special" character (@, !, $, etc.)',
             reg: '[@!\$\^_\*&]'
-        },{
-            desc:'Using at least 12 characters',
-            reg:'[\\w]{12}'
-        },{
-            desc:'Not using a bad password',
-            negate:true,
-            reg:['password','pass','1234','123','admin','abc','abcd','pwd'].map(q=>`(${q})`).join('|')
+        }, {
+            desc: 'Using at least 12 characters',
+            reg: '[\\w]{12}'
+        }, {
+            desc: 'Not using a bad password',
+            negate: true,
+            reg: ['password', 'pass', '1234', '123', 'admin', 'abc', 'abcd', 'pwd'].map(q => `(${q})`).join('|')
         }],
             badStuff = reqs.filter(re => { //stuff we're MISSINg
                 const reg = new RegExp(re.reg);
-                if(re.negate){
+                if (re.negate) {
                     return !!reg.test($scope.pwd);
                 }
                 return !reg.test($scope.pwd);
             });
-        $scope.pwdStr = {recs:badStuff,score:reqs.length-badStuff.length,maxScore:5,show:$scope.pwdStr.show}
+        $scope.pwdStr = { recs: badStuff, score: reqs.length - badStuff.length, maxScore: 5, show: $scope.pwdStr.show }
     }
     $scope.register = () => {
         if (!$scope.pwd || !$scope.pwdDup || !$scope.user) {
@@ -142,13 +142,17 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
                             }).catch(e => {
                                 if (e.data == 'duplicate') {
                                     bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
-                                }else if(e.data='unconf'){
-                                    return bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons!`);
+                                } else if (e.data = 'unconf') {
+                                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                                    return $state.go('appSimp.login');
                                 }
                             });
                     }).catch(e => {
                         if (e.data == 'duplicate') {
                             bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
+                        }else if (e.data = 'unconf') {
+                            bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
+                            return $state.go('appSimp.login');
                         }
                     });
             });

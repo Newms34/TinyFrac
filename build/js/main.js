@@ -68,6 +68,10 @@ app
                 url: '/group',
                 templateUrl: 'components/group.html'
             })
+            .state('app.mod', {
+                url: '/mod',
+                templateUrl: 'components/mod.html'
+            })
             //SIMPLE (unauth'd: login, register, forgot, 404, 500,reset)
             .state('appSimp', {
                 abstract: true,

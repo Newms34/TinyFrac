@@ -18,11 +18,18 @@ app.controller('nav-cont',function($scope,$http,$state, $log, userFact){
     $scope.navEls = [{
         st:'dash',
         icon:'user-circle',
-        text:'Home'
+        text:'Account',
+        protected:false,
     },{
         st:'group',
         icon:'users',
-        text:'Group'
+        text:'Group',
+        protected:false,
+    },{
+        st:'mod',
+        icon:'users',
+        text:'Moderator',
+        protected:true,
     }];
     $scope.goState = s =>{
         $scope.currState = s;

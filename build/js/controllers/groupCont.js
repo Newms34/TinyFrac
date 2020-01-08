@@ -4,7 +4,7 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
     $scope.refUsr();
     $scope.refGrps = () => {
         $http.get('/groups/group').then(r => {
-            console.log(r.data)
+            console.log('REFD GRPS',r.data)
             $scope.groups = r.data;
         })
     }
@@ -19,7 +19,8 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
             $http.post('/groups/group', $scope.newGrp).then(r => {
                 console.log(r);
                 $scope.makinGroup = false;
-                $scope.$digest();
+                // $scope.$digest();
+                $scope.refGrps();
             })
         }
     }
@@ -42,7 +43,8 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
             choice = $scope.$parent.$parent.user.chars.find(a=>a.name==choiceName);
             console.log('USER PICKED',choice,'FOR GROUP',d,'BUT IM NOT GONNA DO ANYTHING WITH IT SO THERE')
             $http.put('/groups/member', { grpId: d,char:choice}).then(r => {
-                console.log(r);
+                // console.log(r);
+                $scope.refGrps();
             })
         },`<button class='button is-info' onclick='bulmabox.runCb(bulmabox.params.cb,true)'>Got it!</button>`)
     }
