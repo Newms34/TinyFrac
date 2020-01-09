@@ -111,7 +111,9 @@
                         <th ng-click='sortEmBy(["prof","subProf"])' class='pokey'>
                             <i class="fa fa-caret-up" ng-if='chrSort.rev && chrSort.col.toString()=="prof,subprof"'></i>
                             <i class="fa fa-caret-down" ng-if='!chrSort.rev && chrSort.col.toString()=="prof,subProf"'></i>
-                            Profession
+                            
+                            <span class="is-hidden-tablet">Prof.</span>
+                            <span class="is-hidden-mobile">Profession</span>
                         </th>
                         <th ng-click='sortEmBy("race")' class='pokey'>
                             <i class="fa fa-caret-up" ng-if='chrSort.rev && chrSort.col=="race"'></i>
@@ -134,9 +136,14 @@
                     </tr>
                     <tr ng-repeat='chr in user.chars|orderBy: chrSort.col:chrSort.rev'>
                         <td>{{chr.name}}</td>
-                        <td><img src="./img/profs/{{(chr.subProf||chr.prof).toLowerCase()}}.png" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">{{chr.subProf||chr.prof}}</td>
                         <td>
-                            <img src="./img/races/{{chr.race.toLowerCase()}}.png" alt="{{chr.race}}" title="{{chr.race}}">&nbsp;{{chr.race}}
+                            <img class='is-icon-mobile' src="./img/profs/{{(chr.subProf||chr.prof).toLowerCase()}}.png" alt="{{chr.subProf||chr.prof}}" title="{{chr.subProf||chr.prof}}">
+                            <span class="is-hidden-mobile">
+                                {{chr.subProf||chr.prof}}</span>
+                        </td>
+                        <td>
+                            <img class='is-icon-mobile' src="./img/races/{{chr.race.toLowerCase()}}.png" alt="{{chr.race}}" title="{{chr.race}}">
+                            <span class="is-hidden-mobile">{{chr.race}}</span>
                         </td>
                         <!-- <td><span ng-if='chr.race!="Asura"' title="This character is not an asura! Please check with your fellow [TINY]s if it's still okay to use this character (up to the group)!"><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.race}}</td> -->
                         <td><span ng-if='chr.level!=80' title="This character is not max level! Most fractal groups will not accept sub-max-level characters."><i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;&nbsp;</span>{{chr.level}}</td>

@@ -9,17 +9,17 @@ app.controller('mod-cont', ($scope, $state, $http, $q, userFact, $log) => {
         const thisUser = ($scope.user && $scope.user.user)||($scope.$parent.user && $scope.$parent.user.user);
         $http.get('/user/users').then(r=>{
             console.log('thisUser',thisUser,r.data.map(q=>q.user))
-            $scope.users = r.data.filter(q=>q && q.user!=thisUser);
+            $scope.users = r.data.filter(q=>q && q.user!=thisUser && !q.superMod);
         })
     }
     $scope.refAllUsrs();
-    setInterval(function(){
-        // console.log($scope.user||'NO USER!')
-        if(!($scope.user && $scope.user.superMod)&&!($scope.$parent.user && !$scope.$parent.user.superMod)){
-            $state.go('app.dash')
-            // console.log('NOT MOD')
-        }
-    },30);
+    // setInterval(function(){
+    //     // console.log($scope.user||'NO USER!')
+    //     if(!($scope.user && $scope.user.superMod)&&!($scope.$parent.user && !$scope.$parent.user.superMod)){
+    //         $state.go('app.dash')
+    //         // console.log('NOT MOD')
+    //     }
+    // },30);
     $scope.toggleBan = u =>{
         const title = u.isBanned?`Unban User`:`Ban User`,
         msg = u.isBanned?`Are you sure you wish to unban the user ${u.user}? This will restore their access to TinyFracs.`:`Are you sure you wish to ban the user ${u.user}? This will revoke their access to TinyFracs!`;

@@ -186,6 +186,21 @@ app
             }
         };
     }]);
+    app.run(['$transitions', 'userFact', '$state','$q', ($transitions, userFact, $state,$q) => {
+        $transitions.onBefore({ to: 'app.mod', from: '*' }, () => {
+          const deferred = $q.defer();
+        //   const prommy = new Promise();
+            userFact.getUser().then(r=>{
+                if(r.superMod){
+                    deferred.resolve();
+                }else{
+                    deferred.resolve($state.target('app.dash', undefined, { location: true }));
+                }
+            })
+        //   });
+          return deferred.promise;
+        }, {priority: 10});
+      }]);
     
 
 String.prototype.titleCase = function () {

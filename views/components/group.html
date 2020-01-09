@@ -18,16 +18,16 @@
                                         <th>
                                             Creator
                                         </th>
-                                        <th>
+                                        <th class='is-hidden-mobile'>
                                             Levels/Restrictions
-                                        </th>
-                                        <th>
+                                        </th class='is-hidden-mobile'>
+                                        <th class='is-hidden-mobile'>
                                             Times
                                         </th>
-                                        <th>
+                                        <th class='is-hidden-mobile'>
                                             TINYs
                                         </th>
-                                        <th>
+                                        <th class='is-hidden-mobile'>
                                             Notes
                                         </th>
                                         <th>Actions</th>
@@ -37,16 +37,17 @@
                                     <tr ng-repeat='g in groups'>
                                         <td>{{g.grpId}}</td>
                                         <td>{{g.creator.name}}</td>
-                                        <td>{{g.levels}}</td>
-                                        <td>{{g.times}}</td>
-                                        <td><ul>
+                                        <td class='is-hidden-mobile'>{{g.levels}}</td class='is-hidden-mobile'>
+                                        <td class='is-hidden-mobile'>{{g.times}}</td>
+                                        <td class='is-hidden-mobile'><ul>
                                             <li ng-repeat='m in g.members'>
                                                 <img class='smol-img' src="./img/races/{{m.race}}.png" alt="">
                                                 {{m.name}}
                                             </li>
                                         </ul></td>
-                                        <td>{{g.notes}}</td>
+                                        <td class='is-hidden-mobile'>{{g.notes}}</td>
                                         <td>
+                                            <button class="button is-link is-hidden-tablet" style='margin-bottom:5px'><i class="fa fa-eye"></i>&nbsp;Info</button>
                                             <button class="button is-info" ng-show='!isGrpMember(g).length' ng-click='addGrp(g.grpId);'>
                                                 <i class="fa fa-check"></i>&nbsp;Join
                                             </button>
