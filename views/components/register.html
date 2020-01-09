@@ -8,7 +8,7 @@
             <form name='regForm' class='is-fullwidth'>
                 <div class='card card-content' ng-if='!cmmNoSecure'>
                     Warning:
-                    <button class="button is-small is-danger is-pulled-right" ng-click='acceptNoSecure()'>x</button>
+                    <button class="button is-small is-danger is-pulled-right" ng-click='cmmNoSecure=true;'>x</button>
                     <div class='is-size-7'>
                         This app isn't 100% secure yet. Use at your own risk!
                     </div>
@@ -16,7 +16,7 @@
                 <h4 class='col-md-offset-2 col-md-8 alert reg-grp'>Account Information</h4>
                 <div class="field">
                     <p class="control has-icons-left">
-                        <input class="input" type="text" placeholder="Username" ng-model='user' ng-change='checkUser();' autocomplete="off">
+                        <input class="input" type="text" placeholder="Username" ng-model='user' ng-change='checkUser();' autocomplete="off" title="Generally not seen. It's just what you use to sign in.">
                         <span class="icon is-small is-left">
                             <i class="fa fa-user"></i>
                         </span>
@@ -34,7 +34,15 @@
                 </div>
                 <div class="field">
                     <p class="control has-icons-left">
-                        <input class="input" type="password" autocomplete="off" placeholder="Password" name='pwd' ng-model='pwd' ng-change='checkPwdStr()'>
+                        <input class="input" type="text" placeholder="API Key" ng-model='apiKey' autocomplete="off" title='Enter a valid GW2 API key (with Account, Progression, Builds, and Characters permissions) to auto-fill everything (and be auto-confirmed!).'>
+                        <span class="icon is-small is-left">
+                            <i class="fa fa-key"></i>
+                        </span>
+                    </p>
+                </div>
+                <div class="field">
+                    <p class="control has-icons-left">
+                        <input class="input" type="password" autocomplete="off" placeholder="Password" name='pwd' ng-model='pwd' ng-change='checkPwdStr()' title="Don't use your GW2 password. Don't even think about it. Stop it.">
                         <span class="icon is-small is-left">
                             <i class="fa fa-lock"></i>
                         </span>

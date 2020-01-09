@@ -6,6 +6,7 @@ const router = express.Router(),
     // mongoose = require('mongoose'),
     uuid = require('uuid'),
     passport = require('passport'),
+    guildIds = ['BA7EC8EA-6B52-E811-81A8-90824340DEC8', '7D0DB7CC-02FE-E911-81AA-A77AA130EAB8', '0A9D5AFD-9709-E911-81A8-A25FC8B1A2FE'],
     axe = require('axios'),
     specializations = require('./profData.json'),
     fs = require('fs');
@@ -119,7 +120,7 @@ const routeExp = function (io, mongoose) {
                 });
             } else {
                 if (usr && !usr.isBanned && !usr.locked) {
-                    if(!usr.confirmed){
+                    if (!usr.confirmed) {
                         return res.status(400).send('unconf')
                     }
                     req.session.passport = {
@@ -145,6 +146,38 @@ const routeExp = function (io, mongoose) {
             }
         })(req, res, next);
     });
+    router.put('/confirmViaApi', (req, res, next) => {
+        if (!req.body.k || !req.body.u) {
+            return res.status(400).send('noKey');//no key, uh...
+        }
+        axe('https://api.guildwars2.com/v2/tokeninfo?access_token=' + req.body.k).then(r => {
+            const missingPerms = ['account', 'progression', 'builds', 'characters'].filter(q => !r.data.permissions.includes(q)).length;
+            if (missingPerms) {
+                return res.status(400).send('badKey');
+            }
+            axe('https://api.guildwars2.com/v2/account?access_token=' + req.body.k).then(rg => {
+                if (!guildIds.filter(q => rg.data.guilds.includes(q)).length) {
+                    return res.status(400).send('notTiny')
+                }
+                mongoose.model('User').findOne({ gw2AcctName: rg.data.name }, function (err, acct) {
+                    if (acct || err) {
+                        //account ALREADY exists with this gw2 account name!
+                        return res.status(400).send('duplicate');
+                    }
+                    mongoose.model('User').findOne({ user: req.body.u }, function (err, usr) {
+                        usr.gw2AcctName = rg.data.name;
+                        usr.save((e, s) => {
+                            res.send(rg.data.name);
+                        })
+                    })
+                })
+            }).catch(e => {
+                res.status(400).send('badKey');
+            })
+        }).catch(e => {
+            res.status(400).send('badKey');
+        })
+    })
     router.get('/logout', function (req, res, next) {
         /*this function logs out the user. It has no confirmation stuff because
         1) this is on the backend
@@ -226,80 +259,127 @@ const routeExp = function (io, mongoose) {
     //automatic gw2 account stuff (create/edit chars, get account frac lvl)
     router.put('/addByAPI', this.authbit, (req, res, next) => {
         //using a gw2 api key, fetch the characters for this account. This overwrites current chars
-        if (!req.query.k) {
+        if (!req.body.k) {
             res.status(401).send('noKey');
         }
-        axe.get('https://api.guildwars2.com/v2/characters?ids=all&access_token=' + req.query.k).then(r => {
+        axe.get('https://api.guildwars2.com/v2/characters?ids=all&access_token=' + req.body.k).then(r => {
             // ({
             //     name: c.name,
             //     prof: c.profession,
             //     race: c.race
             // })
             req.user.chars = r.data.map(c => {
-                const subProfOpts = c.specializations.pve.map(sp=>specializations.elites.find(q=>q.id==sp.id)).filter(f=>!!f);
+                const subProfOpts = c.specializations.pve.map(sp => specializations.elites.find(q => q.id == sp.id)).filter(f => !!f);
                 // console.log(c.name,subProfOpts);
                 const chr = {
-                        name: c.name,
-                        prof: c.profession,
-                        race: c.race,
-                        level:c.level,
-                        icon:specializations.regular[c.profession]
-                    }
-                if(!!subProfOpts.length && subProfOpts[0]){
+                    name: c.name,
+                    prof: c.profession,
+                    race: c.race,
+                    level: c.level,
+                    icon: specializations.regular[c.profession]
+                }
+                if (!!subProfOpts.length && subProfOpts[0]) {
                     chr.subProf = subProfOpts[0].name,
-                    chr.icon = subProfOpts[0].icon
+                        chr.icon = subProfOpts[0].icon
                 }
                 return chr;
             });
             // res.send(r.data);
             //now, we need the user's fractal lvl
-            axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.query.k).then(r=>{
+            axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.body.k).then(r => {
                 req.user.fracLvl = r.data.fractal_level;
                 req.user.save((e, s) => {
                     res.send('refresh');
                 })
-            }).catch(e=>{
-                console.log('fl err',e)
+            }).catch(e => {
+                console.log('fl err', e)
                 res.status(400).send('err')
             })
-        }).catch(e=>{
-            console.log('getChar err',e,'key was',req.query.k)
+        }).catch(e => {
+            console.log('getChar err', e, 'key was', req.query.k)
             res.status(400).send('err')
         })
     })
-    // router.put('/fracLevel', this.authbit, (req, res, next) => {
-    //     axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.query.k).then(r => {
-    //         req.user.fracLvl = r.data.fractal_level;
-    //         req.user.save((e, s) => {
-    //             res.send('refresh');
-    //         })
-    //     })
-    // })
+
+    router.put('/addByAPIUnlogged', (req, res, next) => {
+        //using a gw2 api key, fetch the characters for this account. This overwrites current chars
+        console.log(req.body)
+        if (!req.body.k || !req.body.u || !req.body.p) {
+            res.status(401).send('noKey');
+        }
+        mongoose.model('User').findOne({ user: req.body.u }, (err, usr) => {
+            if (err || !usr) {
+                return res.status(400).send('err');
+            }
+            console.log('Correct password?', usr.correctPassword(req.body.p))
+            if (!usr.correctPassword(req.body.p)) {
+                return res.status(401).send('errLog');
+            }
+            axe.get('https://api.guildwars2.com/v2/characters?ids=all&access_token=' + req.body.k).then(r => {
+                // ({
+                //     name: c.name,
+                //     prof: c.profession,
+                //     race: c.race
+                // })
+                usr.chars = r.data.map(c => {
+                    const subProfOpts = c.specializations.pve.map(sp => specializations.elites.find(q => q.id == sp.id)).filter(f => !!f);
+                    // console.log(c.name,subProfOpts);
+                    const chr = {
+                        name: c.name,
+                        prof: c.profession,
+                        race: c.race,
+                        level: c.level,
+                        icon: specializations.regular[c.profession]
+                    }
+                    if (!!subProfOpts.length && subProfOpts[0]) {
+                        chr.subProf = subProfOpts[0].name,
+                            chr.icon = subProfOpts[0].icon
+                    }
+                    return chr;
+                });
+                // res.send(r.data);
+                //now, we need the user's fractal lvl
+                axe.get('https://api.guildwars2.com/v2/account?access_token=' + req.body.k).then(r => {
+                    usr.fracLvl = r.data.fractal_level;
+                    usr.confirmed = true;
+                    usr.save((e, s) => {
+                        res.send('filled');
+                    })
+                }).catch(e => {
+                    console.log('fl err', e)
+                    res.status(400).send('err')
+                })
+            }).catch(e => {
+                // console.log('getChar err', e, 'key was', req.query.k)
+                res.status(400).send('err')
+            })
+        })
+    })
     //manual gw2 account stuff (if user wants!)
-    router.delete('/char',this.authbit,(req,res,next)=>{
-        req.user.chars = req.user.chars.filter(q=>q._id!=req.query.c);
-        req.user.save((e,s)=>{
+    router.delete('/char', this.authbit, (req, res, next) => {
+        req.user.chars = req.user.chars.filter(q => q._id != req.query.c);
+        req.user.save((e, s) => {
             res.send('refresh')
         })
     })
-    router.put('/char',this.authbit,(req,res,next)=>{
-        const missingInfo = ['name','prof','race','level'].filter(q=>!req.body[q]);
-        if(missingInfo && missingInfo.length){
+    router.put('/char', this.authbit, (req, res, next) => {
+        const missingInfo = ['name', 'prof', 'race', 'level'].filter(q => !req.body[q]);
+        if (missingInfo && missingInfo.length) {
             return res.status(400).send('err')
         }
-        if(req.user.chars.find(q=>q.name.toLowerCase()==req.body.name)){
+        if (req.user.chars.find(q => q.name.toLowerCase() == req.body.name)) {
             return res.status(400).send('duplicate');
         }
         req.user.chars.push(req.body);
-        req.user.save((e,s)=>{
-            console.log('ERR',e,'SAVE',s)
+        req.user.save((e, s) => {
+            console.log('ERR', e, 'SAVE', s)
             res.send('refresh');
         })
         // res.send('noNewChars');
     })
-    router.put('/fracManual',this.authbit,(req,res,next)=>{
-        req.user.fracLvl = req.query.l|| req.user.fracLvl;
-        req.user.save((e,s)=>{
+    router.put('/fracManual', this.authbit, (req, res, next) => {
+        req.user.fracLvl = req.query.l || req.user.fracLvl;
+        req.user.save((e, s) => {
             res.send('refresh')
         })
     })
@@ -427,16 +507,16 @@ const routeExp = function (io, mongoose) {
         }
     });
     //supermod stuff
-    router.put('/confirm',this.authbit,this.isSuperMod,(req,res,next)=>{
+    router.put('/confirm', this.authbit, this.isSuperMod, (req, res, next) => {
         mongoose.model('User').findOne({
-            user:req.body.user
-        },(err,u)=>{
-            if(err||!u){
+            user: req.body.user
+        }, (err, u) => {
+            if (err || !u) {
                 return res.status(400).send('err');
             }
             u.confirmed = true;
-            u.save((e,s)=>{
-                res.send('Confirmed '+u.user);
+            u.save((e, s) => {
+                res.send('Confirmed ' + u.user);
             })
         });
     })

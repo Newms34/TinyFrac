@@ -73,7 +73,7 @@ app.controller('dash-cont', ($scope, $http, $q, userFact, $log) => {
             <li>Head on over to <a href="https://account.arena.net/">https://account.arena.net/</a> and sign in (this is an official site, so don't worry).</li>
             <li>Click the Applications tab.</li>
             <li>Click the "New Key" button if you don't already have an API key listed.</li>
-            <li>You'll need the <code>progression</code>, <code>account</code>, and <code>characters</code> "permissions"</li>
+            <li>You'll need the <code>progression</code>, <code>account</code>, <code>builds</code>, and <code>characters</code> "permissions"</li>
             <li>Click "Create API Key</li>
             <li>Copy and paste that in the box here</li>
             <li>Click the "Use API Key" button</li>

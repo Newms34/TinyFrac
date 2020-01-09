@@ -42,26 +42,32 @@ app.factory('userFact', function ($http, $log) {
             })
         },
         getCharsFromAPI(k) {
-            console.log('GETTING CHARS USING API KEY',k)
-            return $http.put('/user/addByAPI?k='+k).then(function(s){
+            return $http.put('/user/addByAPI', { k: k }).then(function (s) {
                 return s;
-            }).catch(function(e){
+            }).catch(function (e) {
                 return e;
             })
         },
-        removeChar(c){
-            return $http.delete('/user/char?c='+c._id).then(function(s){
+        preFillFromAPI(k, u, p) {
+            return $http.put('/user/addByAPIUnlogged', { k: k, u: u, p: p }).then(function (s) {
+                return s;
+            }).catch(function (e) {
+                return e;
+            })
+        },
+        removeChar(c) {
+            return $http.delete('/user/char?c=' + c._id).then(function (s) {
                 return s;
             })
         },
-        addChar(c){
-            return $http.put('/user/char',c).then(function(s){
-                console.log('RESPONSE FROM addchar',s)
+        addChar(c) {
+            return $http.put('/user/char', c).then(function (s) {
+                console.log('RESPONSE FROM addchar', s)
                 return s;
             })
         },
-        chFracLvl(l){
-            return $http.put('/user/fracManual?l='+l).then(function(r){
+        chFracLvl(l) {
+            return $http.put('/user/fracManual?l=' + l).then(function (r) {
                 return r;
             })
         }

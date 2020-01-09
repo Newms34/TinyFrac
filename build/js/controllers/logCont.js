@@ -8,6 +8,8 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
     $scope.googLog = () => {
         window.location.href = './user/google';
     };
+    $scope.cmmNoSecure = false;
+
     $scope.forgot = () => {
         if (!$scope.user) {
             bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Forgot Password', 'To recieve a password reset email, please enter your username!');
@@ -22,9 +24,9 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
             }
         });
     };
-    $scope.signin = () => {
+    $scope.signin = (u,p) => {
         $log.debug('trying to login with', $scope.user, $scope.pwd);
-        userFact.login({ user: $scope.user, pass: $scope.pwd })
+        userFact.login({ user: u||$scope.user, pass: p||$scope.pwd })
             .then((r) => {
                 $log.debug(r);
                 if (r.data == 'authErr' || !r.data) {
@@ -68,19 +70,12 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
     $scope.emailBad = false;
     // const emailRegex = new RegExp("[A-Za-z0-9]{3}@",'g')
     $scope.checkEmail = () => {
-        // console.log('document active el',document.activeElement)
-        // console.log('comparing',$scope.regForm.email.$viewValue,'onlyIfInv',onlyIfInv,'emailBad curr val',$scope.emailBad)
-        // if(!$scope.emailBad){
-        $scope.emailBad = $scope.regForm.email && $scope.regForm.email.$viewValue.length && !$scope.regForm.email.$valid;
-        // }
-        // else if(!$scope.regForm.email.$viewValue || $scope.regForm.email.$viewValue.length){
-        //     $scope.emailBad=false;
-        // }
-        // $scope.emailBad = $scope.email && $scope.email.length && !$scope.email.search(/([^][()<>@,;:\\". \x00-\x1F\x7F]+|"(\n|(\\\r)*([^"\\\r\n]|\\[^\r]))*(\\\r)*")(\.([^][()<>@,;:\\". \x00-\x1F\x7F]+|"(\n|(\\\r)*([^"\\\r\n]|\\[^\r]))*(\\\r)*"))*@([^][()<>@,;:\\". \x00-\x1F\x7F]+|\[(\n|(\\\r)*([^][\\\r\n]|\\[^\r]))*(\\\r)*])(\.([^][()<>@,;:\\". \x00-\x1F\x7F]+|\[(\n|(\\\r)*([^][\\\r\n]|\\[^\r]))*(\\\r)*]))*/g);
+        $scope.emailBad = $scope.regForm.email && $scope.regForm.email.$viewValue && !$scope.regForm.email.$valid;
     };
     $scope.pwdNoDup = false;
     $scope.checkPwdDup = () => {
-        $scope.pwdNoDup = !$scope.pwd || !$scope.pwdDup || $scope.pwdDup !== $scope.pwd;
+        //check to make sure the two passwords are "duplicates" (i.e, that they match)
+        $scope.pwdNoDup = (!$scope.pwd && $scope.pwdDup) || ($scope.pwd && !$scope.pwdDup) ||($scope.pwd && $scope.pwdDup && $scope.pwd != $scope.pwdDup); 
     }
     $scope.pwdStrStars = [0, 1, 2, 3, 4,];
     $scope.badPwds = ['password', 'pass', '1234', '123', 'admin', 'abc', 'abcd', 'pwd'];
@@ -119,6 +114,33 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
             });
         $scope.pwdStr = { recs: badStuff, score: reqs.length - badStuff.length, maxScore: 5, show: $scope.pwdStr.show }
     }
+    $scope.sendReg = u => {
+        userFact.newUser(u)
+            .then((ts) => {
+                $log.debug('USER WE JUST REGD WAS',u)
+                //if we have an API key, we're gonna try to use that first to populate everything. Otherwise, just login!
+                if(u.API){
+                    $log.debug('HERE IS WHERE WE TRY TO USE THE API KEY');
+                    $http.put(`/user/confirmViaApi`,{k:u.API,u:u.user}).then(pp=>{
+                        $log.debug('USER CONFIRMED AS BELONGING TO: ',pp.data)
+                        userFact.preFillFromAPI(u.API,u.user,u.pass).then(rd=>{
+                            $log.debug('RESULT FROM PREFILL',rd)
+                            $scope.signin(u.user,u.pass)
+                        })
+                    }).catch(e=>{
+                        bulmabox.alert('Invalid API Key',`While we were able to register you, we can't seem to use your API key. You'll need to ask a TINY officer to confirm you, and then enter your information manually.<br>Sorry!`);
+                        $state.go('appSimp.login');
+                    })
+                }
+                else{
+                    $scope.signin($scope.user,$scope.pwd);
+                }
+            }).catch(e => {
+                if (e.data == 'duplicate') {
+                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
+                }
+            });
+    }
     $scope.register = () => {
         if (!$scope.pwd || !$scope.pwdDup || !$scope.user) {
             bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Missing Information', 'Please enter a username, and a password (twice).');
@@ -130,49 +152,23 @@ app.controller('log-cont', function ($scope, $http, $state, $q, userFact, $log) 
                 if (!resp || resp == null) {
                     return false;
                 }
-                userFact.newUser({
+                const theUsr = {
                     user: $scope.user,
                     pass: $scope.pwd,
-                    email: $scope.email
-                })
-                    .then((r) => {
-                        userFact.login({ user: $scope.user, pass: $scope.pwd })
-                            .then(() => {
-                                $state.go('app.dash');
-                            }).catch(e => {
-                                if (e.data == 'duplicate') {
-                                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
-                                } else if (e.data = 'unconf') {
-                                    bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
-                                    return $state.go('appSimp.login');
-                                }
-                            });
-                    }).catch(e => {
-                        if (e.data == 'duplicate') {
-                            bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
-                        }else if (e.data = 'unconf') {
-                            bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;Unconfirmed', `You'll need to talk to Healy Unit or a TINY officer to confirm you. We do this for spam-prevention reasons! We're taking you back to the login page now.`);
-                            return $state.go('appSimp.login');
-                        }
-                    });
+                    email: $scope.email || null,
+                    API: $scope.apiKey || null
+                };
+                $scope.sendReg(theUsr);
             });
         } else {
-            $log.debug('running register with user', $scope.user, 'and pwd', $scope.pwd);
-            userFact.newUser({
+            // $log.debug('running register with user', $scope.user, 'and pwd', $scope.pwd);
+            const theUsr = {
                 user: $scope.user,
                 pass: $scope.pwd,
-                email: $scope.email
-            })
-                .then((r) => {
-                    userFact.login({ user: $scope.user, pass: $scope.pwd })
-                        .then(() => {
-                            $state.go('app.dash');
-                        });
-                }).catch(e => {
-                    if (e.data == 'duplicate') {
-                        bulmabox.alert('<i class="fa fa-exclamation-triangle is-size-3"></i>&nbsp;User Already Exists', "That account already exists. Are you sure you didn't mean to log in?");
-                    }
-                });
+                email: $scope.email || null,
+                API: $scope.apiKey || null
+            };
+            $scope.sendReg(theUsr);
         }
     };
 });

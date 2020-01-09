@@ -13,6 +13,7 @@ const usrSchema = new mongoose.Schema({
     lastLogin: { type: Number, default: 0 },
     oldLastLogin: { type: Number, default: 0 },
     fracLvl: { type: Number, default: 0, required: true },
+    gw2AcctName:String,
     guild: [{ type: Number, default: 0 }],//which guild: Pew ==0, Taimi==1, Samayou==2
     chars: [{
         name: { type: String, required: true },
@@ -52,7 +53,7 @@ const generateSalt = function () {
 usrSchema.statics.generateSalt = generateSalt;
 usrSchema.statics.encryptPassword = encryptPassword;
 usrSchema.methods.correctPassword = function (candidatePassword) {
-    // console.log('slt', this.salt, 'and their pwd:', this.pass);
+    console.log('slt', this.salt, 'and their pwd:', this.pass,'Candidate',candidatePassword);
     return encryptPassword(candidatePassword, this.salt) === this.pass;
 };
 
