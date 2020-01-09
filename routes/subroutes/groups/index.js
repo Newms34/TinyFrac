@@ -61,7 +61,9 @@ const routeExp = function (io, mongoose) {
         }
     };
     this.needsChar = (req, res, next) => {
-        if (req.user && req.user.chars && req.user.chars.length && req.body.char && !!req.user.chars.find(q => q.name.toLowerCase() == req.body.char.name.toLowerCase())) {
+        console.log('IN NEEDSCHAR, WE HAVE',req.body)
+        const thisChar = (req.body.char && req.body.char.name);
+        if (req.user && req.user.chars && req.user.chars.length && req.body.char && !!req.user.chars.find(q => q.name.toLowerCase() == thisChar)) {
             return next();
         }
         res.status(400).send('noChar');
@@ -116,7 +118,7 @@ const routeExp = function (io, mongoose) {
             res.send('refGrp');
         })
     })
-    router.put('/member', this.authbit, this.needsChar, (req, res, next) => {
+    router.put('/memberYes', this.authbit, this.needsChar, (req, res, next) => {
         //for ADDING member to group; we use a separate one for DELETING
         if (!req.body.grpId||!req.body.char) {
             return res.status(400).send('noData');
@@ -138,7 +140,7 @@ const routeExp = function (io, mongoose) {
             })
         })
     })
-    router.delete('/member', this.authbit, this.needsChar, (req, res, next) => {
+    router.put('/memberNo', this.authbit, this.needsChar, (req, res, next) => {
         //for ADDING member to group; we use a separate one for DELETING
         if (!req.body.grpId||!req.body.char) {
             return res.status(400).send('noData');
@@ -149,12 +151,13 @@ const routeExp = function (io, mongoose) {
             }
             const hasChar = !!req.user.chars.find(q=>q.name==req.body.char.name),
             grpHasChar = !!grp.members.find(q=>q.name==req.body.char.name);
-            if(!hasChar || grpHasChar){
+            console.log(hasChar,grpHasChar)
+            if(!hasChar || !grpHasChar){
                 //cannot find this char! most likely trying to add someone ELSE's char
                 //OR this char is already a member of this group
                 return res.status(400).send('charErr')
             }
-            grp.members = grp.members.filter(q=>q.name.toLowerCase()!==req.body.char.toLowerCase());
+            grp.members = grp.members.filter(q=>q.name.toLowerCase()!==req.body.char.name.toLowerCase());
             grp.save((err, gsv) => {
                 res.send('refGrp');
             })

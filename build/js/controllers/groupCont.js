@@ -80,7 +80,7 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
             const choiceName = document.querySelector('#join-grp-select').value,
             choice = $scope.$parent.$parent.user.chars.find(a=>a.name==choiceName);
             console.log('USER PICKED',choice,'FOR GROUP',d,'BUT IM NOT GONNA DO ANYTHING WITH IT SO THERE')
-            $http.put('/groups/member', { grpId: d,char:choice}).then(r => {
+            $http.put('/groups/memberYes', { grpId: d,char:choice}).then(r => {
                 // console.log(r);
                 $scope.refGrps();
             })
@@ -92,7 +92,7 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
                 const char = $scope.isGrpMember(d)[0];
                 console.log('wanna remove member',char);
                 // return false;
-                $http.delete('/groups/member', { grpId: d, char:char}).then(r => {
+                $http.put('/groups/memberNo', { grpId: d.grpId, char:{name:char}}).then(r => {
                     console.log(r);
                 })
             }
