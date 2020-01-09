@@ -63,7 +63,7 @@ const routeExp = function (io, mongoose) {
     this.needsChar = (req, res, next) => {
         console.log('IN NEEDSCHAR, WE HAVE',req.body)
         const thisChar = (req.body.char && req.body.char.name);
-        if (req.user && req.user.chars && req.user.chars.length && req.body.char && !!req.user.chars.find(q => q.name.toLowerCase() == thisChar)) {
+        if (req.user && req.user.chars && req.user.chars.length && req.body.char && !!req.user.chars.find(q => q.name.toLowerCase() == thisChar.toLowerCase())) {
             return next();
         }
         res.status(400).send('noChar');
@@ -120,6 +120,7 @@ const routeExp = function (io, mongoose) {
     })
     router.put('/memberYes', this.authbit, this.needsChar, (req, res, next) => {
         //for ADDING member to group; we use a separate one for DELETING
+        console.log('TRYING TO ADD USER TO GRP. INFO:',req.body)
         if (!req.body.grpId||!req.body.char) {
             return res.status(400).send('noData');
         }
