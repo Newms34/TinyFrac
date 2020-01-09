@@ -47,7 +47,7 @@
                                         </ul></td>
                                         <td class='is-hidden-mobile'>{{g.notes}}</td>
                                         <td>
-                                            <button class="button is-link is-hidden-tablet" style='margin-bottom:5px'><i class="fa fa-eye"></i>&nbsp;Info</button>
+                                            <button class="button is-link is-hidden-tablet" style='margin-bottom:5px' ng-click='descMobGrp(g)'><i class="fa fa-eye"></i>&nbsp;Info</button>
                                             <button class="button is-info" ng-show='!isGrpMember(g).length' ng-click='addGrp(g.grpId);'>
                                                 <i class="fa fa-check"></i>&nbsp;Join
                                             </button>

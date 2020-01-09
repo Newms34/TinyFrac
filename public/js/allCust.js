@@ -553,6 +553,44 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
             })
         }
     }
+    $scope.descMobGrp = g=>{
+        //describes a group via popup for phone (since we can't display the whole table)
+        const grpMems = g.members.map(m=>{
+            return `<li><img class='smol-img' src="./img/races/${m.race}.png" alt="">
+            ${m.name}</li>`
+        }).join('')
+        bulmabox.alert(`Group ${g.grpId}`,`<div class="is-fullwidth">
+        <div class="notification">
+            <span class="has-text-weight-bold">
+                ID:
+            </span>
+            <hr>${g.grpId}
+        </div>
+        <div class="notification">
+            <span class="has-text-weight-bold">
+                Levels:
+            </span>
+            <hr>${g.levels}
+        </div>
+        <div class="notification">
+            <span class="has-text-weight-bold">
+                Times:
+            </span>
+            <hr>${g.times}
+        </div>
+        <div class="notification">
+            <span class="has-text-weight-bold">
+                Members:
+            </span>
+            <hr><ul>${grpMems}</ul>
+        </div>
+        <div class="notification">
+            <span class="has-text-weight-bold">
+                Notes:
+            </span>
+            <hr>${g.notes}</div>
+    </div>`)
+    }
     $scope.addGrp = d => {
         console.log(d);
         const char = $scope.isGrpMember[0];
