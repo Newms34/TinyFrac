@@ -149,8 +149,8 @@ const routeExp = function (io, mongoose) {
             if (err || !grp) {
                 return res.status(400).send('err');
             }
-            const hasChar = !!req.user.chars.find(q=>q.name==req.body.char.name),
-            grpHasChar = !!grp.members.find(q=>q.name==req.body.char.name);
+            const hasChar = !!req.user.chars.find(q=>q.name.toLowerCase()==req.body.char.name.toLowerCase()),
+            grpHasChar = !!grp.members.find(q=>q.name.toLowerCase()==req.body.char.name.toLowerCase());
             console.log(hasChar,grpHasChar)
             if(!hasChar || !grpHasChar){
                 //cannot find this char! most likely trying to add someone ELSE's char
