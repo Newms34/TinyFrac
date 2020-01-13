@@ -34,6 +34,8 @@ app.controller('dash-cont', ($scope, $http, $q, userFact, $log) => {
                     console.log('Err',e)
                     if(e.data && e.data=='duplicate'){
                         return bulmabox.alert('Duplicate Character',`Hey! You've already added that character!`)
+                    }else if(e.data && e.data=='otherAcct'){
+                        return bulmabox.alert('Name Taken',`That character name isn't valid; it looks like it already belongs to someone else!`)
                     }
                     bulmabox.alert('Error Creating Character','There was an error creating a new character! Sorry!')
                 })

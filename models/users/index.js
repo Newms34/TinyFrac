@@ -53,7 +53,7 @@ const generateSalt = function () {
 usrSchema.statics.generateSalt = generateSalt;
 usrSchema.statics.encryptPassword = encryptPassword;
 usrSchema.methods.correctPassword = function (candidatePassword) {
-    console.log('slt', this.salt, 'and their pwd:', this.pass,'Candidate',candidatePassword);
+    // console.log('slt', this.salt, 'and their pwd:', this.pass,'Candidate',candidatePassword);
     return encryptPassword(candidatePassword, this.salt) === this.pass;
 };
 

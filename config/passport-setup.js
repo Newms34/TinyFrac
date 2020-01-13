@@ -117,7 +117,7 @@ passport.use('local-login', new LocalStrategy({
             // login problems!
             //note that these both return the wrong "combo" msg (i.e., wrong pwd+un combo)
             if (!usrFnd) {
-                console.log('User not f ound!', req.body)
+                console.log('User not found!', req.body)
                 return done(null, false, false);
             } else if (!usrFnd.correctPassword(pass)) {
                 usrFnd.wrongAttempts++;

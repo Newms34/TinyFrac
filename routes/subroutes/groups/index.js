@@ -118,6 +118,9 @@ const routeExp = function (io, mongoose) {
             res.send('refGrp');
         })
     })
+    /* These two routes add and remove members from a frac group. 
+    Note that we need two separate routes, as the process of adding involves slotting an item into an array, but
+    the process of removing involves first comparing two arrays (group members and current user characters) to see if there's overlap.*/
     router.put('/memberYes', this.authbit, this.needsChar, (req, res, next) => {
         //for ADDING member to group; we use a separate one for DELETING
         console.log('TRYING TO ADD USER TO GRP. INFO:',req.body)
@@ -142,7 +145,7 @@ const routeExp = function (io, mongoose) {
         })
     })
     router.put('/memberNo', this.authbit, this.needsChar, (req, res, next) => {
-        //for ADDING member to group; we use a separate one for DELETING
+        //for REMOVING member to group; we use a separate one for ADDING
         if (!req.body.grpId||!req.body.char) {
             return res.status(400).send('noData');
         }

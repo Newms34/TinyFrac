@@ -367,16 +367,40 @@ const routeExp = function (io, mongoose) {
         if (missingInfo && missingInfo.length) {
             return res.status(400).send('err')
         }
-        if (req.user.chars.find(q => q.name.toLowerCase() == req.body.name)) {
-            return res.status(400).send('duplicate');
-        }
-        req.user.chars.push(req.body);
-        req.user.save((e, s) => {
-            console.log('ERR', e, 'SAVE', s)
-            res.send('refresh');
+        const actualName = req.body.name.split(' ').map(q => {
+            //CHANGE CAPS TO GW2 FORMAT
+            return q.slice(0, 1).toUpperCase() + q.slice(1).toLowerCase();
+        }).join(' ');
+        mongoose.model('User').findOne({ 'chars.name': actualName }, (err, usr) => {
+            if (req.user.chars.find(q => q.name.toLowerCase() == req.body.name)) {
+                return res.status(400).send('duplicate');
+            }else if(!!usr){
+                return res.status(400).send('otherAcct')
+            }
+            res.send(usr || 'char name available!')
+            req.user.chars.push(req.body);
+            req.user.save((e, s) => {
+                console.log('ERR', e, 'SAVE', s)
+                res.send('refresh');
+            })
         })
         // res.send('noNewChars');
+    });
+    router.get('/testChr', (req, res, next) => {
+        if (!req.query.n) {
+            res.status(400).send('noChar')
+        }
+        //first, we convert to gw2-appropriate name format
+        const actualName = req.query.n.split(' ').map(q => {
+            //CHANGE CAPS TO GW2 FORMAT
+            return q.slice(0, 1).toUpperCase() + q.slice(1).toLowerCase();
+        }).join(' ');
+        console.log('searching for', req.query.n, 'which was converted to', actualName)
+        mongoose.model('User').findOne({ 'chars.name': actualName }, (err, usr) => {
+            res.send(usr || 'char name available!')
+        })
     })
+
     router.put('/fracManual', this.authbit, (req, res, next) => {
         req.user.fracLvl = req.query.l || req.user.fracLvl;
         req.user.save((e, s) => {
