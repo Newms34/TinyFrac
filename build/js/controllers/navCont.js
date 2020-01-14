@@ -27,7 +27,7 @@ app.controller('nav-cont',function($scope,$http,$state, $log, userFact){
         protected:false,
     },{
         st:'mod',
-        icon:'users',
+        icon:'legal',
         text:'Moderator',
         protected:true,
     }];
