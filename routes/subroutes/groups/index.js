@@ -162,9 +162,16 @@ const routeExp = function (io, mongoose) {
                 return res.status(400).send('charErr')
             }
             grp.members = grp.members.filter(q=>q.name.toLowerCase()!==req.body.char.name.toLowerCase());
-            grp.save((err, gsv) => {
-                res.send('refGrp');
-            })
+            if(!grp.members.length){
+                mongoose.model('group').deleteOne({_id:grp._id},(e,s)=>{
+                    console.log('deleted groop!',grp._id)
+                    res.send('refGrp');
+                })
+            }else{   
+                grp.save((err, gsv) => {
+                    res.send('refGrp');
+                });
+            }
         })
     })
     return router;

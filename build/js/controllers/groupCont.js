@@ -87,14 +87,34 @@ app.controller('group-cont', ($scope, $http, $q, userFact, $log) => {
         },`<button class='button is-info' onclick='bulmabox.runCb(bulmabox.params.cb,true)'>Got it!</button>`)
     }
     $scope.removeGrp = d => {
-        bulmabox.confirm('Leave Group','Are you sure you wish to leave this group?',function(r){
+        bulmabox.confirm('<i class="fa fa-question-circle"></i>&nbsp;Leave Group','Are you sure you wish to leave this group?',function(r){
             if(!!r){
                 const char = $scope.isGrpMember(d)[0];
-                console.log('wanna remove member',char);
+                $log.debug('tryin to leave group',d,'with char',char)
+                if(!char){
+                    return bulmabox.alert('<i class="fa fa-exclamation-triangle"></i>&nbsp;Error Leaving Group',`There was an error leaving this group. Either: 
+                    <ol>
+                        <li>You're not a member of this group. You can't leave a group you're not in!</li>
+                        <li>There was some other error and Healy is bad at coding.</li>
+                        <li>The group is the Hotel California, and while you can check out any time you like, you can never leave.</li>
+                    </ol>`)
+                }
                 // return false;
-                $http.put('/groups/memberNo', { grpId: d.grpId, char:{name:char}}).then(r => {
-                    console.log(r);
-                })
+                if(d.members.length<2){
+                    return bulmabox.confirm('<i class="fa fa-question-circle"></i>&nbsp;Abandoning Group',`Hey! You're the last remaining member of this group. Leaving it will automatically delete the group. Are you sure you wish to do this?`,function(lg){
+                        if(!!lg){
+                            // return console.log('WOULD HAVE LEFT GROUP HERE!')
+                            $http.put('/groups/memberNo', { grpId: d.grpId, char:{name:char}}).then(r => {
+                                console.log(r);
+                            })
+                        }
+                    })
+                }else{
+                    // return console.log('WOULD HAVE LEFT GROUP HERE!')
+                    $http.put('/groups/memberNo', { grpId: d.grpId, char:{name:char}}).then(r => {
+                        console.log(r);
+                    })
+                }
             }
         })
     }
